@@ -39,7 +39,7 @@ $this->respond("GET", "/forwarder", function ($request, $response, $service) {
     if($destinty === "educative"){
         $response->redirect("/desktop");
     }else if($destinty === "administration"){
-        $response->redirect("/dashboard");
+        $response->redirect("/project");
     }else if($destinty === "both"){
         $response->redirect("/login/select-module");
     }

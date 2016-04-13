@@ -386,7 +386,55 @@ use ($storeItemsResource, $discountsResource, $enrollmentsResource) {
     ]);
 });
 
+/*
+ * Evaluations
+ */
+$this->respond("GET", "/[i:storeId]/evaluation", function ($request, $response, $service) 
+use ($storeItemsResource, $productsResource, $projectsResource, $discountsResource, $interestsResource) {
+    $storeId = $request->param("storeId");
+    
+    /*
+     * Get store item
+     */
+    $storeItem = $storeItemsResource->get($storeId);
+//    $storeItem = new Store;
+    $product = $productsResource->get($storeItem->getProductId());
+    $project = array_pop($projectsResource->listProjects([
+        "storeId" => $storeItem->getStoreId()
+    ]));
+    
+    $discounts = $discountsResource->listDiscounts([
+        "storeId" => $storeItem->getStoreId()
+    ]);
+    
+    //header params
+    $service->pageTitle = "Registrar Producto";
+    
+    //content params
+    $service->storeItem = $storeItem;
+    $service->product = $product;
+    $service->project = $project;
+    $service->discounts = $discounts;
+    
+    //render
+    $service->render(__PATH__ . "/app/view/store/evaluation.phtml");
+});
 
-$this->respond("GET", "/sample", function ($request, $response, $service) {
-    __class(new Enrollment);
+$this->respond("GET", "/[i:storeId]/evaluation/concept/create", function ($request, $response, $service) 
+use ($storeItemsResource, $productsResource, $projectsResource, $discountsResource, $interestsResource) {
+    //header params
+    $service->pageTitle = "Registrar Concepto de Evaluación";
+    
+    //content params
+//    $service->discounts = $discounts;
+    
+    //render
+    $service->render(__PATH__ . "/app/view/store/concept.create.phtml");
+});
+
+$this->respond("POST", "/[i:storeId]/evaluation/concept/create", function ($request, $response, $service) 
+use ($dfdfdff) {
+    $storeId = $request->param("storeId");
+    
+    
 });

@@ -87,8 +87,11 @@
         <script>
             $(document).ready(function(){
                 $("#login-form").send(function(success){
-                    if(success)
+                    if(success){
                         window.location = "/login/forwarder";
+                    }else{
+                        window.Materialize.toast("El usuario y/o contraseña son incorrectos", 3000);
+                    }
                 }, "json");
             });
         </script>

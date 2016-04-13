@@ -58,6 +58,7 @@ if($session->getMaterialId()){
             case strpos($url, "youtube"):
             case strpos($url, "vimeo"):
             case strpos($url, "google"):
+            case strpos($url, "video.owlgroup.org"):
                 $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
                 break;
             case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):
@@ -187,7 +188,7 @@ if($session->getMaterialId()){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col s4">
+<!--                                <div class="col s4">
                                     <div id="card-alert" class="card orange">
                                         <div class="card-content white-text">
                                             <p>
@@ -199,18 +200,18 @@ if($session->getMaterialId()){
                                             <a class="waves-effect waves-light btn white-text cyan" href="<?= $session->getSessionId() ?>/import-material">Importar desde mis Materiales</a>
                                         </div>
                                     </div>
-                                </div>
+                                </div>-->
                             </div>    
                             <?php
                         }
                         ?>
-                        <div class="row">
+<!--                        <div class="row">
                             <div class="input-field col s12">
                                 <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
                                     <i class="mdi-content-send right"></i>
                                 </button>
                             </div>
-                        </div>
+                        </div>-->
                     </form>
                 </div>
                 <?php

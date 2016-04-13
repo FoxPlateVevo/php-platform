@@ -50,6 +50,7 @@ if($product->getTypePresentation() === Product::TYPE_PRESENTATION_MULTIMEDIA_FIL
         case strpos($url, "youtube"):
         case strpos($url, "vimeo"):
         case strpos($url, "google"):
+        case strpos($url, "video.owlgroup.org"):
             $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
             break;
         case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):

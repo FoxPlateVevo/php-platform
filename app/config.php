@@ -12,6 +12,7 @@ class app_configs{
         'localization',
         'product',
         'project',
+        'sale',
         'store',
         'upload',
         'user'

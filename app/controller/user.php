@@ -69,7 +69,7 @@ $this->respond("POST", "/create", function ($request, $response, $service) use (
         "address"       => $address,
         "cellphone"     => $cellphone,
         "phone"         => $phone,
-        "password"      => null,
+        "password"      => "pass123",
         "status"        => User::STATUS_ACTIVATED,
         "directory"     => null
     ]), new NaturalPerson([
@@ -252,4 +252,50 @@ use ($usersResource) {
     //render
     $service->layout(__PATH__ . "/app/view/layouts/default.to-search.phtml");
     $service->render(__PATH__ . "/app/view/user/students-searcher.phtml");
+});
+
+$this->respond("GET", "/vendors-searcher/?[:filterUserIds]?", function ($request, $response, $service)
+use ($usersResource) {
+    $filterUserIds = $request->param("filterUserIds");
+    
+    /*
+     * Get users
+     */
+    $users  = $usersResource->listUsers([
+        "UserProfileType" => UserProfile::TYPE_VENDOR
+    ]);
+    
+    //header params
+    $service->pageTitle = "Buscar Vendedor";
+    
+    //content params
+    $service->users         = $users;
+    $service->filterUserIds = ($filterUserIds)? explode(",", $filterUserIds) : null;
+    
+    //render
+    $service->layout(__PATH__ . "/app/view/layouts/default.to-search.phtml");
+    $service->render(__PATH__ . "/app/view/user/vendors-searcher.phtml");
+});
+
+$this->respond("GET", "/clients-searcher/?[:filterUserIds]?", function ($request, $response, $service)
+use ($usersResource) {
+    $filterUserIds = $request->param("filterUserIds");
+    
+    /*
+     * Get users
+     */
+    $users  = $usersResource->listUsers([
+        "UserProfileType" => [UserProfile::TYPE_CLIENT, UserProfile::TYPE_STUDENT]
+    ]);
+    
+    //header params
+    $service->pageTitle = "Buscar Cliente";
+    
+    //content params
+    $service->users         = $users;
+    $service->filterUserIds = ($filterUserIds)? explode(",", $filterUserIds) : null;
+    
+    //render
+    $service->layout(__PATH__ . "/app/view/layouts/default.to-search.phtml");
+    $service->render(__PATH__ . "/app/view/user/clients-searcher.phtml");
 });

@@ -1,0 +1,109 @@
+<?php
+use Underscore\Underscore as _;
+
+$products       = $this->products;
+$storeItems = $this->storeItems;
+$filterStoreIds = $this->filterStoreIds;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <h5 class="breadcrumbs-title">Buscar Producto</h5>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Moneda</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Moneda</th>
+                                <th>Categoría</th>
+                                <th>Estado</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($storeItems){
+                            _::each($storeItems, function(Store $storeItem) use ($filterStoreIds, $products){
+                                if($filterStoreIds && in_array($storeItem->getStoreId(), $filterStoreIds)){
+                                    return;
+                                }
+                                
+                                $product = $products[$storeItem->getProductId()];
+//                                $product = new Product;
+                                
+                                $finalProduct = $product->finalProduct;
+//                                $finalProduct = new Course();
+                                ?>
+                                <tr>
+                                    <td><?= $storeItem->getStoreId() ?></td>
+                                    <td><?= $product->getName() ?></td>
+                                    <td><?= $storeItem->getPrice() ?></td>
+                                    <td><?= $storeItem->getTypeCoin() ?></td>
+                                    <td><?= $product->getCategoryId() ?></td>
+                                    <td><?= $storeItem->getStatus() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn"
+                                           data-price="<?= $storeItem->getPrice() ?>"
+                                           data-text="<?= $product->getName() ?>"
+                                           data-value="<?= $storeItem->getStoreId() ?>">Seleccionar</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay Usuarios</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $("a[data-value][data-text]").click(function(){
+                        if(window.opener){
+                            $(window.opener.document).find("[searcher-store-target-text]").val($(this).attr("data-text"));
+                            $(window.opener.document).find("[searcher-store-target-value]").val($(this).attr("data-value"));
+                            $(window.opener.document).find("[searcher-store-target-price]").val($(this).attr("data-price"));
+                            
+                            window.close();
+                        }
+                    });
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

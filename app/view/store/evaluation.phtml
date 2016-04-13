@@ -1,0 +1,108 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItem  = $this->storeItem;
+$project    = $this->project;
+$product    = $this->product;
+$groups     = $this->groups;
+
+$finalProduct = $product->finalProduct;
+
+//$storeItem = new Store();
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Producto en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $storeItem->getStoreId() ?>">Estructura y planificación</a></li>
+                        <li><a href="/store/<?= $storeItem->getStoreId() ?>">Ventas</a></li>
+                        <li><a href="/store/<?= $storeItem->getStoreId() ?>/enrollment">Matrículas</a></li>
+                        <li class="active">Evaluaciones</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <h4 class="header2">Evaluaciones</h4>
+            <div class="row">
+                <div class="col s12">
+                    <button class="btn cyan waves-effect waves-light" type="button" id="button-delete" disabled>Eliminar</button>
+                    <a class="btn cyan waves-effect waves-light" href="evaluation/concept/create">Crear Concepto</a>
+                </div>
+            </div>
+            <div class="row">
+                <h4 class="header2">Conceptos de evaluación</h4>
+                <div class="col s12">
+                    <table id="educative-resource-table" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Orden</th>
+                                <th>Concepto</th>
+                                <th>Peso</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Orden</th>
+                                <th>Concepto</th>
+                                <th>Peso</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($evaluationConcepts){
+                            _::each($evaluationConcepts, function(EvaluationConcept $evaluationConcept){
+                                ?>
+                            <tr data-id="<?= $evaluationConcept->getEvaluationConceptId() ?>">
+                                    <td>
+                                        <input type="checkbox" class="browser-default" value="<?= $evaluationConcept->getEvaluationConceptId() ?>">
+                                    </td>
+                                    <td><?= $evaluationConcept->getPosition() ?></td>
+                                    <td><?= $evaluationConcept->getName() ?></td>
+                                    <td><?= $evaluationConcept->getWeight() ?></td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="3">No hay conceptos de evaluación</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

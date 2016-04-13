@@ -3,16 +3,30 @@
 require_once __PATH__ . "/app/model/Discount.php";
 require_once __PATH__ . "/app/model/Interest.php";
 require_once __PATH__ . "/app/model/Enrollment.php";
+require_once __PATH__ . "/app/model/Sale.php";
+require_once __PATH__ . "/app/model/SaleDetail.php";
 
 class Service_Store {
     public $discounts;
     public $interests;
     public $enrollments;
+    public $sales;
+    public $saleDetails;
+    public $concepts;
+    public $evaluations;
+    public $exams;
+    public $questionGroups;
+    public $questions;
+    public $answers;
+    public $studentEvaluationDetails;
+    public $studentEvaluations;
     
     public function __construct() {
-        $this->discounts = new Service_Store_Discounts_Resource();
-        $this->interests = new Service_Store_Interests_Resource();
-        $this->enrollments = new Service_Store_Enrollments_Resource();
+        $this->discounts    = new Service_Store_Discounts_Resource();
+        $this->interests    = new Service_Store_Interests_Resource();
+        $this->enrollments  = new Service_Store_Enrollments_Resource();
+        $this->sales        = new Service_Store_Sales_Resource();
+        $this->saleDetails  = new Service_Store_SaleDetails_Resource();
     }
 }
 
@@ -280,5 +294,164 @@ class Service_Store_Enrollments_Resource {
         ]);
         
         return $affectedRows;
+    }
+}
+
+class Service_Store_Sales_Resource {
+    public function listSales(array $optionParams = null) {
+        /*
+         * storeId      : optional String, Array
+         */
+        $alternateAttributes = [
+            "saleId"    => "cod_venta",
+            "clientUserId"          => "cod_usuario_cliente",
+            "vendorUserId"       => "cod_usuario_vendedor",
+            "status"       => "estado",
+        ];
+        
+        $CONDITIONALS_PART_STRING = get_conditional_string($alternateAttributes, $optionParams);
+        
+        $query = "
+            SELECT
+            cod_venta,
+            fecha_registro,
+            cod_usuario_cliente,
+            cod_usuario_vendedor,
+            fecha_emision,
+            fecha_vencimiento,
+            tipo_moneda,
+            modalidad_pago,
+            comentario,
+            estado,
+            fecha_registro_documento_cuota_pago,
+            cantidad_cuota_pago
+            FROM venta
+            {$CONDITIONALS_PART_STRING}
+            ";
+        
+        $objectsData = db::fetchAll($query);
+        
+        $objects = [];
+        
+        foreach ($objectsData as $objectData){
+            $objects[$objectData->cod_venta] = new Sale([
+                "saleId" => $objectData->cod_venta,
+                "vendorUserId" => $objectData->cod_usuario_vendedor,
+                "clientUserId" => $objectData->cod_usuario_cliente,
+                "registryDate" => $objectData->fecha_registro,
+                "emissionDate" => $objectData->fecha_emision,
+                "expirationDate" => $objectData->fecha_vencimiento,
+                "typeCoin" => $objectData->tipo_moneda,
+                "paymentMethod" => $objectData->modalidad_pago,
+                "comment" => $objectData->comentario,
+                "status" => $objectData->estado,
+                "feePaymentDocumentRegistryDate" => $objectData->fecha_registro_documento_cuota_pago,
+                "feePaymentQuantity" => $objectData->cantidad_cuota_pago,
+            ]);
+        }
+        
+        return $objects;
+    }
+    
+    public function insert(Sale $object){
+        $insertedId = db::insert("venta", [
+            "fecha_registro" => $object->getRegistryDate(),
+            "cod_usuario_cliente" => $object->getClientUserId(),
+            "cod_usuario_vendedor" => $object->getVendorUserId(),
+            "fecha_emision" => $object->getEmissionDate(),
+            "fecha_vencimiento" => $object->getExpirationDate(),
+            "tipo_moneda" => $object->getTypeCoin(),
+            "modalidad_pago" => $object->getPaymentMethod(),
+            "comentario" => $object->getComment(),
+            "estado" => $object->getStatus(),
+            "fecha_registro_documento_cuota_pago" => $object->getFeePaymentDocumentRegistryDate(),
+            "cantidad_cuota_pago" => $object->getFeePaymentQuantity(),
+        ]);
+        
+        return $insertedId;
+    }
+    
+    public function get($id){
+        return array_pop($this->listSales([
+            "saleId" => $id
+        ]));
+    }
+    
+    public function update(Sale $object){
+        $affectedRows = db::update("venta", [
+            "fecha_registro" => $object->getRegistryDate(),
+            "cod_usuario_cliente" => $object->getClientUserId(),
+            "cod_usuario_vendedor" => $object->getVendorUserId(),
+            "fecha_emision" => $object->getEmissionDate(),
+            "fecha_vencimiento" => $object->getExpirationDate(),
+            "tipo_moneda" => $object->getTypeCoin(),
+            "modalidad_pago" => $object->getPaymentMethod(),
+            "comentario" => $object->getComment(),
+            "estado" => $object->getStatus(),
+            "fecha_registro_documento_cuota_pago" => $object->getFeePaymentDocumentRegistryDate(),
+            "cantidad_cuota_pago" => $object->getFeePaymentQuantity(),
+        ], [
+            "cod_venta" => $object->getSaleId()
+        ]);
+        
+        return $affectedRows;
+    }
+    
+    public function delete($id){
+        $affectedRows = db::delete("venta", [
+            "cod_venta" => $id
+        ]);
+        
+        return $affectedRows;
+    }
+}
+
+class Service_Store_SaleDetails_Resource {
+    public function listSaleDetails(array $optionParams = null) {
+        $alternateAttributes = [
+            "storeId"       => "cod_almacen",
+            "saleId"        => "cod_venta",
+        ];
+        
+        $CONDITIONALS_PART_STRING = get_conditional_string($alternateAttributes, $optionParams);
+        
+        $query = "
+            SELECT
+            precio,
+            cantidad,
+            descuento,
+            cod_almacen,
+            cod_venta,
+            FROM det_venta
+            {$CONDITIONALS_PART_STRING}
+            ";
+        
+        $objectsData = db::fetchAll($query);
+        
+        $objects = [];
+        
+        foreach ($objectsData as $objectData){
+            $objects[] = new SaleDetail([
+                "storeId" => $objectData->cod_almacen,
+                "saleId" => $objectData->cod_venta,
+                "quantity" => $objectData->cantidad,
+                "price" => $objectData->precio,
+                "discount" => $objectData->descuento,
+            ]);
+        }
+        
+        return $objects;
+    }
+    
+    public function insert(SaleDetail $object){
+        $insertedId = db::insert("det_venta", [
+            "cod_almacen" => $object->getStoreId(),
+            "cod_venta" => $object->getSaleId(),
+            "cantidad" => $object->getQuantity(),
+            "precio" => $object->getPrice(),
+            "descuento" => $object->getDiscount(),
+        ]);
+        
+        return $insertedId;
     }
 }

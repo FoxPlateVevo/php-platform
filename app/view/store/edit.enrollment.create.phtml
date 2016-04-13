@@ -1,6 +1,7 @@
 <?php
 use Underscore\Underscore as _;
 
+$storeItem = $this->storeItem;
 $product = $this->product;
 $group = $this->group;
 $currentStudentUserIds = $this->currentStudentUserIds;
@@ -41,8 +42,9 @@ $currentStudentUserIdsValue = ($currentStudentUserIds)? implode(",", $currentStu
                     <form class="col s12" method="post" action="create-enrollment">
                         <div class="row">
                             <div class="input-field col s6">
-                                <input id="sale-id" type="text" name="sale-id">
+                                <input id="sale-id" type="text" name="sale-text-id" searcher-sale-target-text>
                                 <label for="sale-id">Ficha de venta</label>
+                                <input type="hidden" name="sale-id" searcher-sale-target-value>
                             </div>
                             <div class="input-field col s6">
                                 <input type="date" class="datepicker" value="<?= get_dateformated_from_date(get_date()) ?>" disabled>
@@ -74,7 +76,7 @@ $currentStudentUserIdsValue = ($currentStudentUserIds)? implode(",", $currentStu
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <button class="btn cyan waves-effect waves-light right" type="submit"> Generar
+                                <button class="btn cyan waves-effect waves-light right" type="submit" id="generate-button" disabled> Generar
                                     <i class="mdi-content-send right"></i>
                                 </button>
                             </div>
@@ -91,6 +93,33 @@ $currentStudentUserIdsValue = ($currentStudentUserIds)? implode(",", $currentStu
                         window.open("/user/students-searcher/<?= $currentStudentUserIdsValue ?>", "Buscar Usuario", "width=1000, height=600");
                     });
                     
+                    $("#sale-id").click(function(){
+                        window.open("/sale/sales-searcher/<?= $currentSaleIdsValue ?>", "Buscar Ficha de Venta", "width=1000, height=600");
+                    });
+                    
+                    var $button = $("#generate-button");
+                    
+                    $("#sale-id").bind("blur", function(){
+                        console.log("consulta....");
+                        
+                        if($(this).val().trim() === ""){
+                            return;
+                        }
+                        
+                        $.get("/sale/confirm-enrollment", {
+                            saleId: $(this).val(),
+                            storeId: <?= $storeItem->getStoreId() ?>
+                        }, function(response){
+                            console.log(response);
+                            
+                            if(response){
+                                $button.removeAttr("disabled");
+                            }else{
+                                $button.attr("disabled", true);
+                                window.Materialize.toast("La venta seleccionada no tiene items disponible para la matrícula en el producto", 3000);
+                            }
+                        }, "json");
+                    });
                 });
             </script>
             

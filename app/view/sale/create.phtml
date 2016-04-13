@@ -1,0 +1,300 @@
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Ventas</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/sale">Ventas</a></li>
+                        <li class="active">Crear Venta</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12" method="post" action="/sales/create" id="form-sale">
+                                <h4 class="header2">Generar Ficha de Venta</h4>
+                                <div class="row">
+                                    <div class="input-field col s4">
+                                        <input id="vendor-user-name" type="text" name="vendor-user-name" searcher-vendor-target-text>
+                                        <label for="vendor-user-name">Vendedor</label>
+                                        <input type="hidden" name="vendor-user-id" searcher-vendor-target-value>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input type="date" class="datepicker" name="emission-date" value="<?= get_dateformated_from_date(get_date()) ?>">
+                                        <label>Fecha de Emisión</label>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input type="date" class="datepicker" name="expiration-date" value="<?= get_dateformated_from_date(get_date()) ?>">
+                                        <label>Fecha de Expiración</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s4">
+                                        <input id="client-user-name" type="text" name="client-user-name" searcher-client-target-text>
+                                        <label for="client-user-name">Cliente</label>
+                                        <input type="hidden" name="client-user-id" searcher-client-target-value>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <select name="type-coin">
+                                            <option value="<?= Sale::TYPE_COIN_PEN ?>"><?= Sale::TYPE_COIN_PEN ?></option>
+                                            <option value="<?= Sale::TYPE_COIN_USD ?>"><?= Sale::TYPE_COIN_USD ?></option>
+                                        </select>
+                                        <label>Tipo de Moneda</label>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input type="text" value="Pago al contado" disabled>
+                                        <label>Modalidad de Pago</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s8">
+                                        <textarea id="comment" class="materialize-textarea" name="comment"></textarea>
+                                        <label for="comment" >Comentario</label>
+                                    </div>
+                                </div>
+                                <h4 class="header2">Añadir Producto</h4>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input id="product-name" type="text" name="product-name" searcher-store-target-text>
+                                        <label for="product-name">Producto</label>
+                                        <input type="hidden" name="store-id" id="store-id" searcher-store-target-value>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s4">
+                                        <input id="quantity" type="number" name="quantity" min="1" step="1" value="1">
+                                        <label for="quantity">Cantidad</label>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input id="price" type="text" name="price" searcher-store-target-price value="0">
+                                        <label for="price">Precio</label>
+                                    </div>
+                                    <div class="input-field col s4">
+                                        <input id="discount" type="text" name="discount" value="0">
+                                        <label for="discount">Descuento</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light" 
+                                            id="add-button"
+                                            type="button"> Añadir
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h4 class="header2">Detalle de venta</h4>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button id="delete-button" class="btn cyan waves-effect waves-light" type="button">Eliminar</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <table id="data-table" class="responsive-table display" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Item</th>
+                                                    <th>Código</th>
+                                                    <th>Producto</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Precio</th>
+                                                    <th>Descuento</th>
+                                                    <th>Importe</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-default>
+                                                    <td colspan="7">No hay productos en esta lista</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col s12" style="font-size: 1.2em">
+                                        <div style="text-align: right"><strong>Bruto</strong> S./<span id="bruto">00.00</span></div>
+                                        <div style="text-align: right"><strong>IGV(18%)</strong> S./<span id="igv">00.00</span></div>
+                                        <div style="text-align: right"><strong>Importe Total</strong> S./<span id="importe-total">00.00</span></div>
+                                    </div>
+                                </div>
+<!--                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light" type="submit">Generar Documento de Cuotas a pagar</button>
+                                    </div>
+                                </div>-->
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light right" type="submit"> Generar
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * For search
+                     */
+                    $("#vendor-user-name").click(function(){
+                        window.open("/user/vendors-searcher/<?= $currentVendorUserIdsValue ?>", "Buscar Vendedor", "width=1000, height=600");
+                    });
+                    $("#client-user-name").click(function(){
+                        window.open("/user/clients-searcher/<?= $currentClientUserIdsValue ?>", "Buscar Cliente", "width=1000, height=600");
+                    });
+                    
+                    $("#product-name").click(function(){
+                        window.open("/product/products-searcher/<?= $currentStoreIdsValue ?>", "Buscar Producto", "width=1000, height=600");
+                    });
+                    
+                    var $deleteButton = $("#delete-button").attr("disabled", true);
+                    
+                    var $storeId = $("#store-id");
+                    var $quantity = $("#quantity");
+                    var $price = $("#price");
+                    var $discount = $("#discount");
+                    var $dataTable = $("#data-table");
+                    var detail = {};
+                    
+                    $deleteButton.click(function(){
+                        $dataTable.find("tbody tr td input[type=checkbox]:checked").each(function(){
+                            delete detail[$(this).val()];
+                            
+                            $dataTable.find("tbody tr[data-store-id=" + $(this).val() + "]").remove();
+                            
+                            if($.isEmptyObject(detail)){
+                                $dataTable.find("tbody").append("<tr data-default><td colspan='7'>No hay productos en esta lista</td></tr>");
+                            }
+                        });
+                    });
+                    
+                    /*
+                     * add button
+                     */
+                    $("#add-button").click(function(){
+                        if($storeId.val()){
+                            if(!($storeId.val() in detail)){
+                                detail[$storeId.val()] = {
+                                    storeId: $storeId.val(),
+                                    quantity: $quantity.val(),
+                                    price: $price.val(),
+                                    discount: $discount.val()
+                                };
+
+                                if($dataTable.find("tbody tr[data-default]")){
+                                    $dataTable.find("tbody tr[data-default]").remove();
+                                }
+
+                                var index = $dataTable.find("tbody tr").length + 1;
+
+                                $dataTable.find("tbody").append("<tr data-store-id='" + $storeId.val() + "'>" +
+                                "<td><input type='checkbox' class='browser-default' value='" + $storeId.val() + "'></td>" +      
+                                "<td>" + index + "</td>" +      
+                                "<td>" + $storeId.val() + "</td>" +      
+                                "<td>" + $("#product-name").val() + "</td>" +      
+                                "<td>" + $quantity.val() + "</td>" +      
+                                "<td>" + $price.val() + "</td>" +      
+                                "<td>" + $discount.val() + "</td>" +      
+                                "<td data-importe>" + ($quantity.val() * $price.val() - $quantity.val() * $discount.val()) + "</td>" +      
+                                "</tr>");
+                        
+                                $dataTable.find("tbody tr td input[type=checkbox]").unbind("click");
+                                $dataTable.find("tbody tr td input[type=checkbox]").click(function(){
+                                    var selectedStoreIds = [];
+                                
+                                    $dataTable.find("tbody tr td input[type=checkbox]:checked").each(function(){
+                                        selectedStoreIds.push(true);
+                                    });
+
+                                    if(selectedStoreIds.length){
+                                        $deleteButton.removeAttr("disabled");
+                                    }else{
+                                        $deleteButton.attr("disabled", true);
+                                    }
+                                });
+                                
+
+                                var bruto = 0;
+
+                                $dataTable.find("tbody tr td[data-importe]").each(function(){
+                                    bruto += +$(this).text();
+                                });
+
+                                $("#bruto").text(bruto.toFixed(2));
+                                $("#igv").text((bruto * 0.18).toFixed(2));
+                                $("#importe-total").text((bruto + (bruto * 0.18)).toFixed(2));
+                                
+                                $storeId.val("");
+                                $price.val("0");
+                                $quantity.val("1");
+                                $discount.val("0");
+                                $("#product-name").val("");
+                            }else{
+                                window.Materialize.toast("El producto ya se encuentra en el detalle de venta", 3000);
+                            }
+                        }else{
+                            window.Materialize.toast("Debes seleccionar un producto", 3000);
+                        }
+                    });
+                    
+                    
+                    $("#form-sale").on("submit", function(e){
+                        e.preventDefault();
+                        
+                        if(!$("input[name=vendor-user-id]").val()){
+                            window.Materialize.toast("Se debe establecer un vendedor para esta venta", 3000);
+                            return;
+                        }else if(!$("input[name=client-user-id]").val()){
+                            window.Materialize.toast("Se debe establecer un cliente para esta venta", 3000);
+                            return;
+                        }else if($.isEmptyObject(detail)){
+                            window.Materialize.toast("El detalle de venta debe contener como mínimo un producto", 3000);
+                            return;
+                        }
+                        
+                        $.post("/sale/create", {
+                            vendorUserId: $("input[name=vendor-user-id]").val(),
+                            emissionDate: $("input[name=emission-date]").val(),
+                            expirationDate: $("input[name=expiration-date]").val(),
+                            clientUserId: $("input[name=client-user-id]").val(),
+                            typeCoin: $("select[name=type-coin]").val(),
+                            comment: $("textarea[name=comment]").val(),
+                            detail: detail
+                        }, function(success){
+                            console.log(success);
+                            
+                            if(success){
+                                window.location.href = "/sale";
+                            }else{
+                                window.Materialize.toast("Ha ocurrido un error al intentar realizar el registro de la venta", 3000);
+                            }
+                        }, "json");
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

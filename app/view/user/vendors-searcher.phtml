@@ -1,0 +1,99 @@
+<?php
+use Underscore\Underscore as _;
+
+$users = $this->users;
+$filterUserIds = $this->filterUserIds;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col s12">
+                    <h5 class="breadcrumbs-title">Buscar Vendedor</h5>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre y Apellidos</th>
+                                <th>DNI</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre y Apellidos</th>
+                                <th>DNI</th>
+                                <th>Email</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($users){
+                            _::each($users, function(User $user) use ($filterUserIds){
+                                if($user->getPersonType() === User::PERSON_TYPE_NATURAL){
+                                    if($filterUserIds && in_array($user->getUserId(), $filterUserIds)){
+                                        return;
+                                    }
+                                    
+                                    $naturalPerson = $user->person;
+//                                    $naturalPerson = new NaturalPerson();
+                                    ?>
+                                    <tr>
+                                        <td><?= $user->getUserId() ?></td>
+                                        <td><?= "{$naturalPerson->getName()}, {$naturalPerson->getLastName()} {$naturalPerson->getMotherLastName()}" ?></td>
+                                        <td><?= $naturalPerson->getDni() ?></td>
+                                        <td><?= $user->getEmail() ?></td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn"
+                                               data-text="<?= "{$naturalPerson->getName()}, {$naturalPerson->getLastName()}" ?>"
+                                               data-value="<?= $user->getUserId() ?>">Seleccionar</a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay Usuarios</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $("a[data-value][data-text]").click(function(){
+                        if(window.opener){
+                            $(window.opener.document).find("[searcher-vendor-target-text]").val($(this).attr("data-text"));
+                            $(window.opener.document).find("[searcher-vendor-target-value]").val($(this).attr("data-value"));
+                            
+                            window.close();
+                        }
+                    });
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

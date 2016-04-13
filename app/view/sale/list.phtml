@@ -1,0 +1,95 @@
+<?php
+use Underscore\Underscore as _;
+
+$sales  = $this->sales;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Ventas</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/sale">Ventas</a></li>
+                        <li class="active">Lista de Ventas</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/sale/create">Crear Venta</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código de Venta</th>
+                                <th>Fecha de Registro</th>
+                                <th>Modalidad de Pago</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código de Venta</th>
+                                <th>Fecha de Registro</th>
+                                <th>Modalidad de Pago</th>
+                                <th>Estado</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($sales){
+                            _::each($sales, function(Sale $sale){
+                                ?>
+                                <tr>
+                                    <td><?= $sale->getSaleId() ?></td>
+                                    <td><?= $sale->getRegistryDate() ?></td>
+                                    <td><?= $sale->getPaymentMethod() ?></td>
+                                    <td><?= $sale->getStatus() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn" href="/sale/<?= $sale->getSaleId() ?>">Ver</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="5">No hay ventas</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

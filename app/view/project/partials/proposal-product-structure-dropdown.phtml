@@ -51,8 +51,22 @@ if($product instanceof Product && $project instanceof Project){
         </li>
     </ul>
     <!--end dropdown select-->
-    <a class="btn cyan waves-effect waves-light" href="/store/<?= $project->getStoreId() ?>/register">Registrar Producto</a>
     <?php
+    $product                                    = new Service_Product();
+    $storeItemsResource                         = $product->storeItems;
+    
+    $storeItem = $storeItemsResource->get($project->getStoreId());
+//    $storeItem = new Store();
+    
+    if($storeItem->getStatus() === Store::STATUS_STRUCTURED){
+        ?>
+        <a class="btn cyan waves-effect waves-light" href="/store/<?= $project->getStoreId() ?>">Ir al Producto</a>
+        <?php
+    }else{
+        ?>
+        <a class="btn cyan waves-effect waves-light" href="/store/<?= $project->getStoreId() ?>/register">Registrar Producto</a>
+        <?php
+    }
 }else{
     ?>
     <strong>Se importo el dropdown navegador del proyecto, pero ha ocurrido un error</strong>
