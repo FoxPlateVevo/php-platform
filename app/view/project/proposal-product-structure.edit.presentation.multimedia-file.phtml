@@ -1,0 +1,109 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+/*
+ * Upload
+ */
+$uploadToken = create_upload_token("/products/courses/{$product->getProductId()}/presentation", 2, [
+    "mp4", 
+    "doc", 
+    "docx",
+    "ppt", 
+    "pptx", 
+    "pdf", 
+    "jpg", 
+    "png"
+]);
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <p class="caption">Subir archivo multimedia de presentación</p>
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/presentation/multimedia-file"
+                          name="presentation-form">
+                        <div class="row">
+                            <div class="col s12">
+                                <div id="multimedia-file"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * Upload
+                     */
+                    var upload = new Upload({
+                        id      : '#multimedia-file',
+                        name    : 'multimedia-file',
+                        token   : '<?= $uploadToken ?>',
+                        preFiles: []
+                    });
+                    
+                    upload.open();
+                    
+                    /*
+                     * Form
+                     */
+                    $("form[name=presentation-form]").send(function (response) {
+                        console.log(response);
+                        if (response.success){
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000, "", function(){
+                                window.location = response.URIredirect;
+                            });
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

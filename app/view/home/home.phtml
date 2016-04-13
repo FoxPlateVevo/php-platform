@@ -1,0 +1,94 @@
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title"><?= $this->title ?></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            <?php
+            use Underscore\Underscore as _;
+
+            $folderPath = "E:\Material Admin Template\materialize.v3.1";
+
+            $components = folder::getComponents($folderPath);
+
+            $store = [];
+
+            _::each($components, function($component) use ($folderPath, &$store){
+                $componentPath = "{$folderPath}/{$component}";
+
+                if(has_extension($component, "html") && 
+                is_file($componentPath)){
+                    /*
+                    Extract all css and js files in each one
+                    */
+                    $contentFile = file_get_contents($componentPath);
+
+                    $jsMatchGroup = $cssMatchGroup = [];
+
+                    preg_match_all('/\S[\w\/\-\.]+\.js\S/', $contentFile, $jsMatchGroup);
+                    preg_match_all('/\S[\w\/\-\.]+\.css\S/', $contentFile, $cssMatchGroup);
+
+                    $matchGroups = array_merge_recursive($jsMatchGroup, $cssMatchGroup);
+                    $matchesStore = [];
+
+                    _::each($matchGroups, function($matchGroup) use (&$matchesStore){
+                        $matches = _::filter($matchGroup, function($match){
+                            return $match;
+                        });
+
+                        $matchesStore = array_merge($matchesStore, $matches);
+                    });
+
+                    $diffToStore = array_diff($matchesStore, $store);
+                    ?>
+                    <div id="basic-collections" class="section">
+                        <div class="row">
+                            <div class="col s12 m4 l3">
+                                <p class="header"><?= $component ?></p>
+                            </div>
+                            <div class="col s12 m8 l9">
+                                <ul class="collection">
+                                    <?php
+                                    if($diffToStore){
+                                        _::each($diffToStore, function($match){
+                                            ?>
+                                            <li class="collection-item"><?= $match ?></li>
+                                            <?php
+                                        });
+                                    }
+                                    ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+//                    echo "<br><h6>En este documento</h6><hr/>";
+//
+//                    _::each($matchesStore, function($match){
+//                        echo "<em>{$match}</em><br/>";
+//                    });
+
+                    $store = array_merge($store, $diffToStore);
+                }
+            });
+        ?>
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

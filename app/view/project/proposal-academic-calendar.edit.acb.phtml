@@ -1,0 +1,233 @@
+<?php
+
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$proposalAcademicCalendar = $this->proposalAcademicCalendar;
+$responsibleUser          = $this->responsibleUser;  
+$proposalAcademicCalendarRanges = $this->proposalAcademicCalendarRanges;
+$events = $this->events;
+
+$person = $responsibleUser->person;
+//$person = new NaturalPerson();
+
+//$project = new Project();
+//$proposalAcademicCalendar = new ProposalAcademicCalendar();
+//$responsibleUser = new User;
+
+$proposalProductStructureLink = null;
+
+if($proposalAcademicCalendar->getStatus() === ProposalAcademicCalendar::STATUS_GRANTED){
+    if($project->getStoreId()){
+        $proposalProductStructureLink = "/project/{$project->getProjectId()}/product-structure/{$project->getStoreId()}";
+    }
+}
+
+$academicCalendarStatus = [
+    ProposalAcademicCalendar::STATUS_FILED,
+    ProposalAcademicCalendar::STATUS_GRANTED,
+    ProposalAcademicCalendar::STATUS_PENDING
+];
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li class="active">Edición de Propuesta de Calendario Académico</li>
+                        <?php
+                        if ($proposalProductStructureLink) {
+                            ?>
+                            <li><a href="<?= $proposalProductStructureLink ?>">Propuesta de Estructura de Producto</a></li>
+                            <?php
+                        }
+                        ?>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12"
+                                  method="post"
+                                  action="<?= $proposalAcademicCalendar->getProposalAcademicCalendarId() ?>/update-status">
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <textarea id="ac-description" class="materialize-textarea grey-text" name="ac-description"><?= $proposalAcademicCalendar->getDescription() ?></textarea>
+                                        <label for="ac-description" >Descripción de Propuesta de Calendario Académico</label>
+                                    </div>
+                                    <div class="col s6">
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input id="registry-date" class="grey-text" type="text" value="<?= get_fulldate_string($proposalAcademicCalendar->getRegistryDate()) ?>">
+                                                <label for="registry-date">Fecha de Creación</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input id="ac-responsible" class="grey-text" type="text" value="<?= "{$person->getName()}, {$person->getLastName()} {$person->getMotherLastName()}" ?>">
+                                                <label for="ac-responsible">Responsable</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <select name="ac-status">
+                                                    <option value="<?= $proposalAcademicCalendar->getStatus() ?>"><?= $proposalAcademicCalendar->getStatus() ?></option>
+                                                    <?php
+                                                    _::each($academicCalendarStatus, function($status) use ($proposalAcademicCalendar){
+                                                        if($proposalAcademicCalendar->getStatus() !== $status){
+                                                            ?>
+                                                            <option value="<?= $status ?>"><?= $status ?></option>
+                                                            <?php
+                                                        }
+                                                    })
+                                                    ?>
+                                                </select>
+                                                <label>Estado</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                                    <i class="mdi-content-send right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row section">
+                            <div class="col s12">
+                                <div class="chip red white-text">
+                                    <i class="mdi-action-stars"></i> Días lectivos
+                                </div>
+                                <div class="chip yellow darken-2 white-text">
+                                    <i class="mdi-action-stars"></i> Días no lectivos
+                                </div>
+                                <div class="chip purple white-text">
+                                    <i class="mdi-action-stars"></i> Vacaciones
+                                </div>
+                                <div class="chip green white-text">
+                                    <i class="mdi-action-stars"></i> Periodo de exámenes
+                                </div>
+                                <div class="chip blue white-text">
+                                    <i class="mdi-action-stars"></i> Periodo de cierre de actas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <h4 class="header">Rangos de fecha establecidos</h4>
+                    <div class="row">
+                        <div class="col s12">
+                            <button class="btn cyan waves-effect waves-light right" type="button" disabled>Eliminar</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>De</th>
+                                        <th>Hasta</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>De</th>
+                                        <th>Hasta</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    <?php
+                                    if ($proposalAcademicCalendarRanges) {
+                                        _::each($proposalAcademicCalendarRanges, function(ProposalAcademicCalendarRange $proposalAcademicCalendarRange) {
+                                            ?>
+                                            <tr>
+                                                <td><?= $proposalAcademicCalendarRange->getStartDate() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getFinalDate() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getType() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getDescription() ?></td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    } else {
+                                        ?>
+                                        <tr>
+                                            <td colspan="4">No hay países</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    var $calendar = $('#calendar');
+
+                    /*
+                     * Calendar
+                     */
+                    $calendar.fullCalendar({
+                        //Settings
+                        firstDay: 1,
+                        editable: true,
+                        eventLimit: true, // allow "more" link when too many events
+                        lang: "es",
+                        selectable: true,
+                        selectHelper: true,
+                        timeFormat: "h(:mm)a",
+                        header: {
+                            left: "today prev,next",
+                            center: "title",
+                            right: "newRange basicDay,basicWeek,month"
+                        },
+                        events: <?= json_encode($events) ?>
+                    });
+                });
+            </script>
+            <!--fullcalendar CSS-->
+            <link href="/js/vendor/plugins/fullcalendar/css/fullcalendar.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+            <!-- Calendar Script -->
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/lib/moment.min.js"></script>
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/js/fullcalendar.min.js"></script>
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/lib/es.js"></script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

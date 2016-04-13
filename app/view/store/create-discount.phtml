@@ -1,0 +1,79 @@
+<?php
+use Underscore\Underscore as _;
+
+$typesDiscount = [
+    Discount::TYPE_FIX_CHARGE,
+    Discount::TYPE_PERCENT,
+];
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Producto en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li class="active">Crear Descuento</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" action="create-discount">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <select name="type-discount">
+                                    <?php
+                                        _::each($typesDiscount, function($typeDiscount){
+                                            ?>
+                                            <option value="<?= $typeDiscount ?>"><?= $typeDiscount ?></option>
+                                            <?php
+                                        });
+                                    ?>
+                                </select>
+                                <label>Tipo de descuento</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="value" type="text" name="value">
+                                <label for="value">Valor</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="description" class="materialize-textarea" name="description"></textarea>
+                                <label for="description" >Descripción</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

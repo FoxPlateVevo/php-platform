@@ -1,0 +1,220 @@
+<?php
+use Underscore\Underscore as _;
+
+$project            = $this->project;
+$product            = $this->product;
+$groups             = $this->groups;
+$groupSelected      = $this->groupSelected;
+$professorDetails   = $this->professorDetails;
+$professors         = $this->professors;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+//$groupSelected = new Group();
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12">
+                    <!--dropdown select-->
+                    <a class='dropdown-button btn' data-activates='dropdown-select'>Plantel Docente</a>
+                    <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+                    <!--end dropdown select-->
+                </div>
+            </div>
+            <h4 class="header2">Plantel Docente Proyectado</h4>
+            <p class="caption">Docentes que forma parte de la estructura del producto</p>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="tabs tab-demo z-depth-1">
+                    <?php
+                    _::each($groups, function(Group $group) use ($groupSelected, $project){
+                        $descriptionPrefix = null;
+                        $activeClassName = null;
+                        $hrefValue = "/project/{$project->getProjectId()}/product-structure/{$project->getStoreId()}/professor-detail/{$group->getGroupId()}";
+                        
+                        if($group->getGroupId() === $groupSelected->getGroupId()){
+                            $hrefValue = "#group-selected";
+                            $activeClassName = "active";
+                        }
+
+                        if($group->getTypeEntry() === Group::TYPE_ENTRY_BY_DEFULT){
+                            $descriptionPrefix = "<strong>(POR DEFECTO)</strong> ";
+                        }
+
+                        ?>
+                        <li class="tab col s3">
+                            <a href="<?= $hrefValue ?>" class="<?= $activeClassName ?>"><?= "{$descriptionPrefix} {$group->getDescription()}" ?></a>
+                        </li>
+                        <?php
+                    });
+                    ?>
+                    </ul>
+                </div>
+                <div class="col s12">
+                    <div id="group-selected" class="col s12">
+                        <div class="row section">
+                            <div class="col s12">
+                                <button class="btn cyan waves-effect waves-light" type="button" id="button-delete" disabled>Eliminar</button>
+                                <a class="btn cyan waves-effect waves-light" href="<?= $groupSelected->getGroupId() ?>/add-professor">Añadir Docente</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <table id="professor-table" class="responsive-table display" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Código</th>
+                                            <th>Nombres</th>
+                                            <th>Apellidos</th>
+                                            <th>Especialidades</th>
+                                            <th>Estado</th>
+                                            <th>Ver información</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th>Código</th>
+                                            <th>Nombres</th>
+                                            <th>Apellidos</th>
+                                            <th>Especialidades</th>
+                                            <th>Estado</th>
+                                            <th>Ver información</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    <?php
+                                    if($professorDetails){
+                                        _::each($professorDetails, function(ProfessorDetail $professorDetail) use ($professors){
+                                            $professor = $professors[$professorDetail->getProfessorUserId()];
+                                            
+                                            $person = $professor->person;
+                                            
+//                                            $professor = new User;
+//                                            $person = new NaturalPerson;
+                                            
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="browser-default" value="<?= $professorDetail->getProfessorUserId() ?>">
+                                                </td>
+                                                <td><?= $professor->getUserId() ?></td>
+                                                <td><?= $person->getName() ?></td>
+                                                <td><?= $person->getLastName() ?></td>
+                                                <td>__No disponible</td>
+                                                <td><?= $professorDetail->getStatus() ?></td>
+                                                <td>
+                                                    <a class="waves-effect waves-light btn" href="#">Ver</a>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    }else{
+                                        ?>
+                                        <tr>
+                                            <td colspan="7">No hay profesores para este grupo</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * For tab options 
+                     */
+                    $("ul.tabs li a").click(function(e){
+                        window.location = $(this).attr("href");
+                    });
+                    
+                    var $deleteButton = $("#button-delete");
+                    
+                    $("#professor-table input[type=checkbox]").click(function(e){
+                        var selectedUserIds = [];
+                        
+                        $("#professor-table input[type=checkbox]:checked").each(function(){
+                            selectedUserIds.push($(this).val());
+                        });
+                        
+                        if(selectedUserIds.length){
+                            $deleteButton.attr("disabled", false);
+                        }else{
+                            $deleteButton.attr("disabled", true);
+                        }
+                    });
+                    
+                    $deleteButton.click(function(e){
+                        var selectedUserIds = [];
+                        
+                        $("#professor-table input[type=checkbox]:checked").each(function(){
+                            selectedUserIds.push($(this).val());
+                        });
+                        
+                        if(!selectedUserIds.length){
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url     : "/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/professor-detail/<?= $groupSelected->getGroupId() ?>/action",
+                            method  : "POST",
+                            data    : { 
+                                action          : "delete",
+                                selectedUserIds : selectedUserIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

@@ -1,0 +1,106 @@
+<?php
+
+use Underscore\Underscore as _;
+
+$storeItem = $this->storeItem;
+$product = $this->product;
+$project = $this->project;
+
+$finalProduct = $product->finalProduct;
+
+//$storeItem = new Store();
+//$product = new Product;
+//$finalProduct = new Course();
+//$project = new Project();
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Productos en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/store">Almacén</a></li>
+                        <li class="active">Registrar Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section" id="work-collections">
+
+            <div class="row">
+                <form class="col s12" method="post" action="register">
+                    <h4 class="header">Registrar Producto</h4>
+                    <ul id="projects-collection" class="collection">
+                        <li class="collection-item avatar">
+                            <i class="mdi-file-folder circle light-blue"></i>
+                            <span class="collection-header">Producto de almacén</span>
+                            <p>STORE-ITEM-<?= $storeItem->getStoreId() ?></p>
+                            <a href="#" class="secondary-content"><i class="mdi-action-grade"></i></a>
+                        </li>
+                        <li class="collection-item">
+                            <div class="row">
+                                <div class="col s12">
+                                    <p class="collections-title">Tipo de Producto</p>
+                                    <p class="collections-content"><?= $product->getType() ?></p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="collection-item">
+                            <div class="row">
+                                <div class="col s12">
+                                    <p class="collections-title">Nombre</p>
+                                    <p class="collections-content"><?= $product->getName() ?></p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="collection-item">
+                            <div class="row">
+                                <div class="col s12">
+                                    <p class="collections-title">Documentos de Planeación</p>
+                                    <p class="collections-content">Propuesta de calendario académico - PCA-<?= $project->getACproposalId() ?></p>
+                                    <p class="collections-content">Propuesta de estructura de producto - PEP-<?= $product->getProductId() ?></p>
+                                    <p class="collections-content">Propuesta de calendario de acciones de gestión académica - PCAGA-null</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <em>* Una vez registrado, el producto estará disponible en la lista de productos</em>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <button class="btn cyan waves-effect waves-light" type="submit"> Registrar
+                                <i class="mdi-content-send right"></i>
+                            </button>
+                            <button class="btn waves-effect waves-light" type="button" onclick="window.history.back()"> Cancelar
+                                <i class="mdi-navigation-close right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

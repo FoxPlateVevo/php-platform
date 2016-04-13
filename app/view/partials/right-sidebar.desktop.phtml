@@ -1,0 +1,132 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItem  = $this->storeItem;
+$units      = $this->units;
+$materials  = $this->materials;
+
+if(!$storeItem || !$units || !$materials){
+    return;
+}
+
+//$storeItem = new Store();
+?>
+<!-- START RIGHT SIDEBAR NAV-->
+<aside id="right-sidebar-nav">
+    <ul id="chat-out" class="side-nav rightside-navigation">
+        <li class="li-hover">
+            <a href="#" data-activates="chat-out" class="chat-close-collapse right">
+                <i class="mdi-navigation-close"></i>
+            </a>
+            <div id="right-search" class="row">
+                <form class="col s12">
+                    <div class="input-field">
+                        <i class="mdi-action-search prefix"></i>
+                        <input id="icon_prefix" type="text" class="validate">
+                        <label for="icon_prefix">Buscar</label>
+                    </div>
+                </form>
+            </div>
+        </li>
+        <li class="li-hover">
+            <ul class="chat-collapsible" data-collapsible="expandable">
+                <?php
+                _::each($units, function(Unity $unit) use ($materials, $storeItem){
+                    $sessions = $unit->sessions;
+                    
+                    if(!$sessions){
+                        return;
+                    }
+                    
+                    ?>
+                    <li>
+                        <div class="collapsible-header light-blue white-text active">
+                            <i class="mdi-action-stars"></i> <?= $unit->getName() ?>
+                        </div>
+                        <div class="collapsible-body">
+                            <!--unit description start-->
+                            <div class="chat-out-list row grey white-text">
+                                <div class="col s2 row-icon">
+                                    <i class="mdi-action-info"></i>
+                                </div>
+                                <div class="col s10 row-content">
+                                    <a class="white-text">Información</a>
+                                    <p>
+                                        <?= $unit->getDescription() ?>
+                                    </p>
+                                    <br>
+                                </div>
+                            </div>
+                            <!--unit description end-->
+                            <?php
+                            _::each($sessions, function(Session $session) use ($materials, $storeItem, $unit){
+                                $material = $materials[$session->getMaterialId()];
+//                                $material = new Material();
+                                
+                                ?>
+                                <div class="chat-out-list row">
+                                    <div class="col s2 row-icon">
+                                        <i class="mdi-action-dashboard"></i>
+                                    </div>
+                                    <div class="col s10 row-content">
+                                        <a href="/course/<?= $storeItem->getStoreId() ?>/unit/<?= $unit->getUnityId() ?>/session/<?= $session->getSessionId() ?>"><?= $session->getName() ?></a>
+                                        <p>
+                                            Registrado el <?= get_fulldate_string($session->getRegistryDate()) ?>.
+                                        </p>
+                                        <p>
+                                            Disponible a partir del <?= get_fulldate_string($session->getAvailabilityStartDate()) ?>
+                                            hasta el <?= get_fulldate_string($session->getAvailabilityFinalDate()) ?>
+                                        </p>
+                                        <p>
+                                            <strong><?= $material->getName() ?></strong>
+                                        </p>
+                                        <br>
+                                    </div>
+                                </div>    
+                                <?php
+                            });
+                            ?>
+                        </div>
+                    </li>
+                    <?php
+                });
+                ?>
+            </ul>
+        </li>
+    </ul>
+</aside>
+<script>
+    $(document).ready(function(){
+        var $board = $("#board");
+        
+        $(".collapsible-body .row-content a[href]").click(function(e){
+            e.preventDefault();
+            
+            var href = $(this).attr("href");
+            
+            $.get(href, function(response){
+                $board.html(response);
+            });
+        });
+    });
+</script>
+<style>
+    #chat-out .chat-out-list{
+        
+    }
+    
+    #chat-out .chat-out-list .row-icon{
+        font-size: 2rem;
+    }
+    
+    #chat-out .chat-out-list .row-content a{
+        font-weight: bolder;
+    }
+    
+    #chat-out .chat-out-list .row-content a,
+    #chat-out .chat-out-list .row-content p{
+        padding: 0rem;
+        margin: 0rem;
+    }
+</style>
+<!-- END RIGHT SIDEBAR NAV-->

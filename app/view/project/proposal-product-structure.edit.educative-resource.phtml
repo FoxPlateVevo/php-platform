@@ -1,0 +1,166 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+$educativeResources = $this->educativeResources;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <!--dropdown select-->
+            <a class='dropdown-button btn' data-activates='dropdown-select'>Recursos educativos</a>
+            <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+            <!--end dropdown select-->
+            <div class="card-panel">
+                <h4 class="header2">Recursos Educativos del Curso</h4>
+                <p class="caption">Recursos educativos que comprenden la estructuación del curso</p>
+                <div class="row">
+                    <div class="col s12">
+                        <button class="btn cyan waves-effect waves-light" type="button" id="button-delete" disabled>Eliminar</button>
+                        <a class="btn cyan waves-effect waves-light" href="educative-resource/create">Añadir Recurso Educativo</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <table id="educative-resource-table" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Descripción</th>
+                                    <th>Ver información</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Cantidad</th>
+                                    <th>Descripción</th>
+                                    <th>Ver información</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                            <?php
+                            if($educativeResources){
+                                _::each($educativeResources, function(EducativeResource $educativeResource){
+                                    ?>
+                                    <tr data-id="<?= $educativeResource->getEducativeResourceId() ?>">
+                                        <td>
+                                            <input type="checkbox" class="browser-default" value="<?= $educativeResource->getEducativeResourceId() ?>">
+                                        </td>
+                                        <td><?= $educativeResource->getEducativeResourceId() ?></td>
+                                        <td><?= $educativeResource->getName() ?></td>
+                                        <td><?= $educativeResource->getQuantity() ?></td>
+                                        <td><?= substr_with_dots($educativeResource->getDescription(), 30) ?></td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn" href="#">Editar</a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                });
+                            }else{
+                                ?>
+                                <tr>
+                                    <td colspan="6">No hay recursos educativos</td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    var $deleteButton = $("#button-delete");
+                    
+                    $("#educative-resource-table input[type=checkbox]").click(function(e){
+                        var selectedEducativeResourceIds = [];
+                        
+                        $("#educative-resource-table input[type=checkbox]:checked").each(function(){
+                            selectedEducativeResourceIds.push($(this).val());
+                        });
+                        
+                        if(selectedEducativeResourceIds.length){
+                            $deleteButton.attr("disabled", false);
+                        }else{
+                            $deleteButton.attr("disabled", true);
+                        }
+                    });
+                    
+                    $deleteButton.click(function(e){
+                        var selectedEducativeResourceIds = [];
+                        
+                        $("#educative-resource-table input[type=checkbox]:checked").each(function(){
+                            selectedEducativeResourceIds.push($(this).val());
+                        });
+                        
+                        if(!selectedEducativeResourceIds.length){
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url     : "/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/educative-resource/action",
+                            method  : "POST",
+                            data    : { 
+                                action      : "delete",
+                                educativeResourceIds    : selectedEducativeResourceIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

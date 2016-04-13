@@ -1,0 +1,62 @@
+<?php
+use Underscore\Underscore as _;
+
+$products = $this->products;
+$storeItems = $this->storeItems;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Mi Escritorio</h5>
+                    <ol class="breadcrumbs">
+                        <li class="active">Mis Cursos y Programas</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <?php
+            if($storeItems){
+                _::each($storeItems, function(Store $storeItem) use ($products){
+                    $product = $products[$storeItem->getProductId()];
+//                    $finalProduct = $product->finalProduct;
+//                    $finalProduct = new Course;
+
+                    ?>
+                    <div class="card cyan darken-1">
+                        <div class="card-content white-text">
+                            <span class="card-title"><?= $product->getName() ?></span>
+                            <p>
+                                <?= $product->getInformation() ?>
+                            </p>
+                        </div>
+                        <div class="card-action cyan darken-3">
+                            <a href="/course/<?= $storeItem->getStoreId() ?>" class="white-text text-accent-1">Ver el curso</a>
+                        </div>
+                    </div>
+                    <?php
+                });
+            }else{
+                ?>
+                <h4 class="header">No hay cursos disponibles</h4>
+                <p>
+                    No existen cursos donde usted se encuentre matriculado
+                </p>
+                <?php
+            }
+            ?>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

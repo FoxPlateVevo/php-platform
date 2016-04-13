@@ -1,0 +1,255 @@
+<?php
+use Underscore\Underscore as _;
+
+$project    = $this->project;
+$product    = $this->product;
+$units      = $this->units;
+$sessionGroups  = $this->sessionGroups;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <!--dropdown select-->
+            <a class='dropdown-button btn' data-activates='dropdown-select'>Syllabus</a>
+            <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+            <!--end dropdown select-->
+            <h4 class="header2">Syllabus del curso</h4>
+            <p class="caption">Unidades y sesiones del curso</p>
+            <div class="row">
+                <div class="col s12">
+                    <button 
+                        class="btn cyan waves-effect waves-light" 
+                        type="button" 
+                        id="delete-unit-button"
+                        disabled
+                        >Eliminar</button>
+                    <a class="btn cyan waves-effect waves-light" href="syllabus/create-unity">Crear Unidad</a>
+                </div>
+            </div>
+            <div class="row section">
+                <ul class="collapsible collapsible-accordion" data-collapsible="expandable" id="units">
+                    <?php
+                    if($units){
+                        _::each($units, function(Unity $unit) use ($sessionGroups){
+                            $dateString = get_fulldate_string($unit->getRegistryDate());
+                            
+                            ?>
+                            <li>
+                                <div class="collapsible-header active">
+                                    <input type="checkbox" class="browser-default margin-right" data-unit-id value="<?= $unit->getUnityId() ?>">
+                                    <?= "{$unit->getPosition()}. {$unit->getName()}" ?>
+                                </div>
+                                <div class="collapsible-body">
+                                    <div class="container">
+                                        <div class="section">
+                                            <div class="row">
+                                                <div class="col s12">
+                                                    <em>Creado el <?= $dateString ?></em>
+                                                </div>
+                                            </div>
+                                            <br>
+                                            <div class="row">
+                                                <div class="col s12">
+                                                    <a class="btn cyan waves-effect waves-light" href="syllabus/unit/<?= $unit->getUnityId() ?>">Editar</a>
+                                                    <a class="btn cyan waves-effect waves-light" href="syllabus/unit/<?= $unit->getUnityId() ?>/create-session">Añadir sesión</a>
+                                                    <a class='dropdown-button btn' data-activates='dropdown-select-unit-<?= $unit->getUnityId() ?>'>Acciones</a>
+                                                    <!--dropdown select-->
+                                                    <ul id='dropdown-select-unit-<?= $unit->getUnityId() ?>' 
+                                                        class='dropdown-content' 
+                                                        data-unit="<?= $unit->getUnityId() ?>">
+                                                        <li>
+                                                            <a href="delete">Eliminar</a>
+                                                        </li>
+<!--                                                        <li>
+                                                            <a href="change">Cambiar de unidad</a>
+                                                        </li>-->
+                                                    </ul>
+                                                    <!--end dropdown select-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="container">
+                                        <div class="section">
+                                            <div class="row">
+                                                <div class="col s12">
+                                                    <table class="responsive-table display session-table" data-unit="<?= $unit->getUnityId() ?>">
+                                                        <tbody>
+                                                        <?php
+                                                        $sessionGroup = $sessionGroups[$unit->getUnityId()];
+                                                        
+                                                        if($sessionGroup){
+                                                            _::each($sessionGroup, function(Session $session) use ($unit){
+                                                                ?>
+                                                                <tr>
+                                                                    <td>
+                                                                        <input type="checkbox" class="browser-default" value="<?= $session->getSessionId() ?>">
+                                                                    </td>
+                                                                    <td><?= "{$session->getPosition()}. {$session->getName()}" ?></td>
+                                                                    <td class="right-align">
+                                                                        <a class="waves-effect waves-light btn" 
+                                                                           href="syllabus/unit/<?= $unit->getUnityId() ?>/session/<?= $session->getSessionId() ?>"
+                                                                           >Editar</a>
+                                                                    </td>
+                                                                </tr>
+                                                                <?php
+                                                            });
+                                                        }else{
+                                                            ?>
+                                                            <tr>
+                                                                <td>No hay sesiones en esta unidad</td>
+                                                            </tr>
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <?php
+                        });
+                    }else{
+
+                    }
+                    ?>
+                </ul>
+            </div>
+            <style>
+                .margin-right{
+                    margin-right: 0.5rem;
+                }
+                table.session-table td{
+                    padding: 0.3rem;
+                }
+            </style>
+            <script>
+                $(document).ready(function(){
+                    var $deleteUnitButton = $("#delete-unit-button");
+                    
+                    $("input[type=checkbox][data-unit-id]").click(function(e){
+                        var selectedUnitIds = [];
+                        
+                        $("input[type=checkbox][data-unit-id]:checked").each(function(){
+                            selectedUnitIds.push($(this).val());
+                        });
+                        
+                        if(selectedUnitIds.length){
+                            $deleteUnitButton.attr("disabled", false);
+                        }else{
+                            $deleteUnitButton.attr("disabled", true);
+                        }
+                    });
+                    
+                    $deleteUnitButton.click(function(e){
+                        var selectedUnitIds = [];
+                        
+                        $("input[type=checkbox][data-unit-id]:checked").each(function(){
+                            selectedUnitIds.push($(this).val());
+                        });
+                        
+                        if(!selectedUnitIds.length){
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url     : "syllabus/unit/action/delete",
+                            method  : "POST",
+                            data    : { 
+                                selectedUnitIds : selectedUnitIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                    
+                    /*
+                     * Session actions
+                     */
+                    $("#units .dropdown-content li a").click(function(e){
+                        e.preventDefault();
+                        
+                        var selectedSessionIds = [];
+                        var unitId = $(this).parent().parent().attr("data-unit");
+                        
+                        $("table[data-unit=" + unitId  + "] input[type=checkbox]:checked").each(function(){
+                            selectedSessionIds.push($(this).val());
+                        });
+                        
+                        if(!selectedSessionIds.length){
+                            return;
+                        }
+                        
+                        var href = $(this).attr("href");
+                        
+                        $.ajax({
+                            url     : "syllabus/session/action/" + href,
+                            method  : "POST",
+                            data    : {
+                                selectedSessionIds  : selectedSessionIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

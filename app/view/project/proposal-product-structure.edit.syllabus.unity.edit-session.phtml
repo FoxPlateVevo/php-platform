@@ -1,0 +1,250 @@
+<?php
+use Underscore\Underscore as _;
+
+$project    = $this->project;
+$product    = $this->product;
+$professors = $this->professors;
+$session    = $this->session;
+$material   = $this->material;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+//$session = new Session;
+
+$currentProfessor = $professors[$session->getProfessorExhibitorUserId()];
+$currentProfessorFullName = substr_with_dots("{$currentProfessor->person->getName()}, {$currentProfessor->person->getLastName()} {$currentProfessor->person->getMotherLastName()}", 40);
+//$currentProfessor = new User;
+
+if($session->getMaterialId()){
+//    $material = new Material;
+    /*
+     * Preview Presentation
+     */
+    $htmlPreviewPresentation = "<em>Vista previa no disponible</em>";
+
+    if($material->getType() === Material::TYPE_MULTIMEDIA_FILE){
+        $filename = $material->getContent();
+        $fileNameExtension = pathinfo($filename, PATHINFO_EXTENSION);
+        $materialPresentationPath = "/resources/upload/materials/{$material->getMaterialId()}.{$fileNameExtension}";
+        
+        switch ($fileNameExtension){
+            case "mp4":
+                $htmlPreviewPresentation = "<video class='video-presentation' src='{$materialPresentationPath}' controls></video>";
+                break;
+            case "doc":
+            case "docx":
+            case "ppt":
+            case "pptx":
+                //not avaible
+                break;
+            case "pdf":
+                $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$materialPresentationPath}'></iframe>";
+                break;
+            case "jpg":
+            case "png":
+                $htmlPreviewPresentation = "<img class='image-presentation' src='{$materialPresentationPath}'>";
+                break;
+        }
+    }else if($material->getType() === Material::TYPE_EMBEDDED_RESOURCE){
+        $htmlPreviewPresentation = null;
+        
+        $content = $material->getContent();
+        
+        $url = get_url_from_string($content);
+
+        switch (true){
+            case strpos($url, "youtube"):
+            case strpos($url, "vimeo"):
+            case strpos($url, "google"):
+                $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
+                break;
+            case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):
+                $htmlPreviewPresentation = "<img class='image-presentation' src='{$url}'>";
+                break;
+            default:
+                $htmlPreviewPresentation = "<a title='Click aquí' target='_blank' href='{$url}'>Click Aquí para ingresar al vínculo de presentación</a>";
+                break;
+        }
+    }
+}
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12">
+                    <a class="btn cyan waves-effect waves-light" 
+                       href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/syllabus">Ir al menu principal de estructuración</a>
+                </div>
+            </div>
+            <div class="card-panel">
+                <p class="caption">Editar Sesión</p>
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="create-session"
+                          name="session-form">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="name" type="text" name="name" value="<?= $session->getName() ?>">
+                                <label for="name">Nombre de la sesión</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="professor-exhibitor-user-id">
+                                    <option value="<?= $currentProfessor->getUserId() ?>"><?= $currentProfessorFullName ?></option>
+                                    <?php
+                                    _::each($professors, function(User $professor) use ($currentProfessor){
+                                        if($currentProfessor->getUserId() !== $professor->getUserId()){
+                                            $person = $professor->person;
+//                                            $person = new NaturalPerson();
+                                            ?>
+                                            <option value="<?= $professor->getUserId() ?>"><?= substr_with_dots("{$person->getName()}, {$person->getLastName()} {$person->getMotherLastName()}", 40) ?></option>    
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Docente Expositor</label>
+                            </div>
+                            <div class="col s6 input-field">
+                                <label>Periodo de Disponibilidad</label>
+                                <br>
+                                <br>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input type="date" class="datepicker" name="availability-start-date" value="<?= get_dateformated_from_date($session->getAvailabilityStartDate(), 'Y-m-d H:i:s') ?>">
+                                        <label>De</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input type="date" class="datepicker" name="availability-final-date" value="<?= get_dateformated_from_date($session->getAvailabilityFinalDate(), 'Y-m-d H:i:s') ?>">
+                                        <label>Hasta</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="position">
+                                    <option value="1">1</option>
+                                </select>
+                                <label>Posición</label>
+                            </div>
+                        </div>
+                        <?php
+                        if(!$session->getMaterialId()){
+                            ?>
+                            <div class="row" id="card-options">
+                                <div class="col s4">
+                                    <div id="card-alert" class="card cyan">
+                                        <div class="card-content white-text">
+                                            <p>
+                                                Puedes importar los siguientes tipos de archivo,
+                                                (Video, Word, Power Point, Imagen)
+                                            </p>
+                                        </div>
+                                        <div class="card-action cyan darken-2">
+                                            <a class="waves-effect waves-light btn white-text" href="<?= $session->getSessionId() ?>/create-multimedia-material">Material Multimedia</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col s4">
+                                    <div id="card-alert" class="card cyan">
+                                        <div class="card-content white-text">
+                                            <p>
+                                                Puedes importar los siguientes recursos embebidos,
+                                                (Youtube, Vimeo, Prezzi, Google Docs, Imagen, Link)
+                                            </p>
+                                        </div>
+                                        <div class="card-action cyan darken-2">
+                                            <a class="waves-effect waves-light btn white-text" href="<?= $session->getSessionId() ?>/create-embedded-material">Material Embebido</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col s4">
+                                    <div id="card-alert" class="card orange">
+                                        <div class="card-content white-text">
+                                            <p>
+                                                Puedes realizar una búsqueda de los materiales 
+                                                de otros cursos y utilizarlos de nuevo
+                                            </p>
+                                        </div>
+                                        <div class="card-action orange darken-2">
+                                            <a class="waves-effect waves-light btn white-text cyan" href="<?= $session->getSessionId() ?>/import-material">Importar desde mis Materiales</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>    
+                            <?php
+                        }
+                        ?>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <?php
+                if($session->getMaterialId()){
+                    ?>
+                    <div class="row section">
+                        <div class="col s12">
+                            <?= $htmlPreviewPresentation ?>
+                        </div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * Form
+                     */
+                    $("form[name=session-form]").send(function (response) {
+                        console.log(response);
+                        if (response.success){
+                            window.Materialize.toast("Se guardaron los datos correctamente", 1000, "", function(){
+                                window.location = response.URIredirect;
+                            });
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

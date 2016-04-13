@@ -1,0 +1,101 @@
+<?php
+use Underscore\Underscore as _;
+
+$product = $this->product;
+$group = $this->group;
+$currentStudentUserIds = $this->currentStudentUserIds;
+
+//$product = new Product;
+//$group = new Group();
+
+$currentStudentUserIdsValue = ($currentStudentUserIds)? implode(",", $currentStudentUserIds) : "";
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Producto en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li class="active">Generar Ficha de Matrícula</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <h4 class="header2">Generar Ficha de Matrícula</h4>
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" action="create-enrollment">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="sale-id" type="text" name="sale-id">
+                                <label for="sale-id">Ficha de venta</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input type="date" class="datepicker" value="<?= get_dateformated_from_date(get_date()) ?>" disabled>
+                                <label>Fecha de Matrícula</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="student-user-name" type="text" name="student-user-name" searcher-target-text>
+                                <label for="student-user-name">Alumno</label>
+                                <input type="hidden" name="student-user-id" searcher-target-value>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="product-name" type="text" name="product-name" value="<?= $product->getName() ?>" disabled>
+                                <label for="product-name">Producto</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="group-description" type="text" name="group-description" value="<?= substr_with_dots($group->getDescription(), 50) ?>" disabled>
+                                <label for="group-description">Grupo</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <textarea id="observation" class="materialize-textarea" name="observation"></textarea>
+                                <label for="observation" >Observaciones</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Generar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * For search saleid
+                     */
+                    $("#student-user-name").click(function(){
+                        window.open("/user/students-searcher/<?= $currentStudentUserIdsValue ?>", "Buscar Usuario", "width=1000, height=600");
+                    });
+                    
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

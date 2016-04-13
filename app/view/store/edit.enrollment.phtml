@@ -1,0 +1,203 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItem  = $this->storeItem;
+$project    = $this->project;
+$product    = $this->product;
+$groups     = $this->groups;
+$groupSelected  = $this->groupSelected;
+$enrollments    = $this->enrollments;
+$students       = $this->students;
+
+$finalProduct = $product->finalProduct;
+
+//$storeItem = new Store();
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Producto en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $storeItem->getStoreId() ?>">Estructura y planificación</a></li>
+                        <li><a href="/store/<?= $storeItem->getStoreId() ?>">Ventas</a></li>
+                        <li class="active">Matrículas</li> 
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <h4 class="header2">Matrículas</h4>
+            <p class="caption">Lista de alumnos con acceso al producto</p>
+            <div class="row">
+                <div class="col s12">
+                    <ul class="tabs tab-demo z-depth-1">
+                    <?php
+                    _::each($groups, function(Group $group) use ($groupSelected, $storeItem){
+                        $descriptionPrefix = null;
+                        $activeClassName = null;
+                        $hrefValue = "/store/{$storeItem->getStoreId()}/enrollment/{$group->getGroupId()}";
+                        
+                        if($group->getGroupId() === $groupSelected->getGroupId()){
+                            $hrefValue = "#group-selected";
+                            $activeClassName = "active";
+                        }
+
+                        if($group->getTypeEntry() === Group::TYPE_ENTRY_BY_DEFULT){
+                            $descriptionPrefix = "<strong>(POR DEFECTO)</strong> ";
+                        }
+
+                        ?>
+                        <li class="tab col s3">
+                            <a href="<?= $hrefValue ?>" class="<?= $activeClassName ?>"><?= "{$descriptionPrefix} {$group->getDescription()}" ?></a>
+                        </li>
+                        <?php
+                    });
+                    ?>
+                    </ul>
+                </div>
+                <div class="col s12">
+                    <div id="group-selected" class="col s12">
+                        <div class="row section">
+                            <div class="col s12">
+                                <a class='dropdown-button btn' data-activates='dropdown-action'>Acciones</a>
+                                <ul id='dropdown-action' class='dropdown-content'>
+                                    <li>
+                                        <a href="enable">Habilitar</a>
+                                    </li>
+                                    <li>
+                                        <a href="disable">Dar de baja</a>
+                                    </li>
+                                    <li>
+                                        <a href="delete">Eliminar</a>
+                                    </li>
+                                </ul>
+                                <a class="btn cyan waves-effect waves-light" href="<?= $groupSelected->getGroupId() ?>/create-enrollment">Generar Matrícula</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <table id="enrollment-table" class="responsive-table display" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Código de Matrícula</th>
+                                            <th>Alumno</th>
+                                            <th>Fecha de Matrícula</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th>Código de Matrícula</th>
+                                            <th>Alumno</th>
+                                            <th>Fecha de Matrícula</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    <?php
+                                    if($enrollments){
+                                        _::each($enrollments, function(Enrollment $enrollment) use ($students){
+                                            $student = $students[$enrollment->getStudentUserId()];
+                                            $person = $student->person;
+                                            
+//                                            $student = new User;
+//                                            $person = new NaturalPerson;
+                                            
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="browser-default" value="<?= $enrollment->getEnrollmentId() ?>">
+                                                </td>
+                                                <td><?= $enrollment->getEnrollmentId() ?></td>
+                                                <td><?= "{$person->getName()}, {$person->getLastName()} {$person->getMotherLastName()}" ?></td>
+                                                <td><?= $enrollment->getRegistryDate() ?></td>
+                                                <td><?= $enrollment->getStatus() ?></td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    }else{
+                                        ?>
+                                        <tr>
+                                            <td colspan="5">No hay estudiantes matrículados</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * For tab options 
+                     */
+                    $("ul.tabs li a").click(function(e){
+                        window.location = $(this).attr("href");
+                    });
+                    
+                    $("#dropdown-action li a").click(function(e){
+                        e.preventDefault();
+                        
+                        var selectedEnrollmentIds = [];
+                                
+                        $("#enrollment-table input[type=checkbox]:checked").each(function(){
+                            selectedEnrollmentIds.push($(this).val());
+                        });
+                        
+                        if(!selectedEnrollmentIds.length){
+                            return;
+                        }
+                        
+                        var href = $(this).attr("href");
+                        
+                        $.ajax({
+                            url     : "/store/<?= $storeItem->getStoreId() ?>/enrollment/<?= $groupSelected->getGroupId() ?>/action/" + href,
+                            method  : "POST",
+                            data    : { 
+                                enrollmentIds    : selectedEnrollmentIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

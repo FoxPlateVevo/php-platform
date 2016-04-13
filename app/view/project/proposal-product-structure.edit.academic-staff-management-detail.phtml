@@ -1,0 +1,168 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+$staffMemberDetails = $this->staffMemberDetails;
+$members = $this->members;
+$userProfiles = $this->userProfiles;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            <div class="row">
+                <div class="col s12">
+                    <!--dropdown select-->
+                    <a class='dropdown-button btn' data-activates='dropdown-select'>Plantel de Gestión Académica</a>
+                    <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+                    <!--end dropdown select-->
+                </div>
+            </div>
+            <h4 class="header2">Plantel de Gestion Académica</h4>
+            <p class="caption">Personal que velará por la administración y la gestión del producto</p>
+            <div class="card-panel">
+                <div class="row">
+                    <div class="col s12">
+                        <a class='dropdown-button btn' data-activates='dropdown-action'>Acciones</a>
+                        <ul id='dropdown-action' class='dropdown-content'>
+                            <li>
+                                <a href="enable">Activar</a>
+                                <a href="disable">Desactivar</a>
+                                <a href="delete">Eliminar</a>
+                            </li>
+                        </ul>
+                        <a class="btn cyan waves-effect waves-light" href="academic-staff-management-detail/add-staff-member">Añadir Personal</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <table id="staff-table" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                            <?php
+                            if($staffMemberDetails){
+                                _::each($staffMemberDetails, function(AcademicStaffManagementDetail $staffMemberDetail) use ($members, $userProfiles){
+                                    $member = $members[$staffMemberDetail->getPersonalUserId()];
+                                    $userProfile = $userProfiles[$staffMemberDetail->getProfileUserId()];
+//                                    $userProfile = new UserProfile;
+                                    $person = $member->person;
+                                    
+//                                    $person = new NaturalPerson;
+
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="browser-default" value="<?= $staffMemberDetail->getPersonalUserId() ?>">
+                                        </td>
+                                        <td><?= $person->getName() ?></td>
+                                        <td><?= $person->getLastName() ?></td>
+                                        <td><?= $userProfile->getDescription() ?></td>
+                                        <td><?= $staffMemberDetail->getStatus() ?></td>
+                                    </tr>
+                                    <?php
+                                });
+                            }else{
+                                ?>
+                                <tr>
+                                    <td colspan="5">No hay personal para la gestión del producto</td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("#dropdown-action li a").click(function(e){
+                        e.preventDefault();
+                        
+                        var selectedStaffMemberUserIds = [];
+                                
+                        $("#staff-table input[type=checkbox]:checked").each(function(){
+                            selectedStaffMemberUserIds.push($(this).val());
+                        });
+                        
+                        if(!selectedStaffMemberUserIds.length){
+                            return;
+                        }
+                        
+                        var href = $(this).attr("href");
+                        
+                        $.ajax({
+                            url     : "/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/academic-staff-management-detail/action",
+                            method  : "POST",
+                            data    : { 
+                                action                      : href,
+                                selectedStaffMemberUserIds  : selectedStaffMemberUserIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

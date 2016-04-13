@@ -1,0 +1,176 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+/*
+ * Preview Presentation
+ */
+$htmlPreviewPresentation = "<em>Vista previa no disponible</em>";
+
+if($product->getTypePresentation() === Product::TYPE_PRESENTATION_MULTIMEDIA_FILE){
+    $filename = $product->getContentPresentation();
+    $fileNameExtension = pathinfo($filename, PATHINFO_EXTENSION);
+    $coursePresentationPath = "/resources/upload/products/courses/{$product->getProductId()}/presentation.{$fileNameExtension}";
+    
+    switch ($fileNameExtension){
+        case "mp4":
+            $htmlPreviewPresentation = "<video class='video-presentation' src='{$coursePresentationPath}' controls></video>";
+            break;
+        case "doc":
+        case "docx":
+        case "ppt":
+        case "pptx":
+            //not avaible
+            break;
+        case "pdf":
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$coursePresentationPath}'></iframe>";
+            break;
+        case "jpg":
+        case "png":
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$coursePresentationPath}'>";
+            break;
+    }
+}else if($product->getTypePresentation() === Product::TYPE_PRESENTATION_EMBEDDED_RESOURCE){
+    $htmlPreviewPresentation = null;
+    
+    $content = $product->getContentPresentation();
+    
+    $url = get_url_from_string($content);
+    
+    switch (true){
+        case strpos($url, "youtube"):
+        case strpos($url, "vimeo"):
+        case strpos($url, "google"):
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
+            break;
+        case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$url}'>";
+            break;
+        default:
+            $htmlPreviewPresentation = "<a title='Click aquí' target='_blank' href='{$url}'>Click Aquí para ingresar al vínculo de presentación</a>";
+            break;
+    }
+}
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <!--dropdown select-->
+            <a class='dropdown-button btn' data-activates='dropdown-select'>Presentación</a>
+            <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+            <!--end dropdown select-->
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/presentation" 
+                          name="presentation-form">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <select name="type-presentation">
+                                    <?php
+                                    if($product->getTypePresentation()){
+                                    ?>
+                                    <option value="<?= $product->getTypePresentation() ?>"><?= $product->getTypePresentation() ?></option>
+                                    <?php
+                                    }
+                                    
+                                    $typePresentations = [
+                                        Product::TYPE_PRESENTATION_MULTIMEDIA_FILE,
+                                        Product::TYPE_PRESENTATION_EMBEDDED_RESOURCE
+                                    ];
+
+                                    _::each($typePresentations, function($typePresentation) use ($product){
+                                        if($typePresentation !== $product->getTypePresentation()){
+                                            ?>
+                                            <option value="<?= $typePresentation ?>"><?= $typePresentation ?></option>    
+                                            <?php
+                                        }
+                                    });
+                                    ?> 
+                                </select>
+                                <label>Tipo de archivo Multimedia</label>
+                            </div>
+                            <div class="input-field col s12" data-parent>
+                                <a class="waves-effect waves-light btn" 
+                                   href="presentation/multimedia-file"
+                                   data-type="<?= Product::TYPE_PRESENTATION_MULTIMEDIA_FILE ?>">
+                                    <i class="mdi-file-cloud-upload"></i> Subir Archivo
+                                </a>
+                            </div>
+                            <div class="input-field col s12" data-parent>
+                                <a class="waves-effect waves-light btn" 
+                                   href="presentation/embedded-resource"
+                                   data-type="<?= Product::TYPE_PRESENTATION_EMBEDDED_RESOURCE ?>">
+                                    Registrar contenido embebido
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row section">
+                            <div class="col s12">
+                                <?= $htmlPreviewPresentation ?>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    var $select = $("form[name=presentation-form] select[name=type-presentation]");
+                    
+                    var handle = function(){
+                        var value = $(this).val();
+                        
+                        console.log(value);
+                        
+                        $("a[data-type]").each(function(){
+                            if($(this).attr("data-type") !== value){
+                                $(this).closest("[data-parent]").hide();
+                            }else{
+                                $(this).closest("[data-parent]").show();
+                            }
+                        });
+                    };
+                    
+                    handle.bind($select.get(0)).call();
+                    
+                    $select.change(handle);
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

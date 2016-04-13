@@ -1,0 +1,69 @@
+<?php
+    $user = get_user_session();
+//    $user = new User();
+    $person = $user->person;
+    
+    if($user->getPersonType() === User::PERSON_TYPE_NATURAL && $person instanceof NaturalPerson){
+        $fullName = $person->getName() . " " . $person->getLastName() . " " . $person->getMotherLastName();
+    }else if($user->getPersonType() === User::PERSON_TYPE_JURIDICAL && $person instanceof JuridicalPerson){
+        $fullName = $person->getTradename();
+    }
+    
+    $fullName = substr_with_dots($fullName, 15);
+    
+    /*
+     * Profile presentation string
+     */
+    $profilePresentationString = ucwords(strtolower(str_replace("_", " ", $user->activeEducativeUserProfile)));
+?>
+<!-- START LEFT SIDEBAR NAV-->
+<aside id="left-sidebar-nav">
+    <ul id="slide-out" class="side-nav fixed leftside-navigation">
+        <li class="user-details cyan darken-2">
+            <div class="row">
+                <div class="col col s4 m4 l4">
+                    <img src="/resources/image/avatar.jpg" alt="" class="circle responsive-img valign profile-image">
+                </div>
+                <div class="col col s8 m8 l8">
+                    <ul id="profile-dropdown" class="dropdown-content">
+                        <li>
+                            <a href="#"><i class="mdi-action-face-unlock"></i> Perfil</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="mdi-action-settings"></i> Config.</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="mdi-communication-live-help"></i> Ayuda</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="/login/signout"><i class="mdi-hardware-keyboard-tab"></i> Salir</a>
+                        </li>
+                    </ul>
+                    <a class="btn-flat dropdown-button waves-effect waves-light white-text profile-btn" href="#" data-activates="profile-dropdown"><?= $fullName ?><i class="mdi-navigation-arrow-drop-down right"></i></a>
+                    <p class="user-roal"><?= $profilePresentationString ?></p>
+                </div>
+            </div>
+        </li>
+        <li class="bold">
+            <a href="/desktop" class="waves-effect waves-cyan">
+                <i class="mdi-action-dashboard"></i> Mis cursos
+            </a>
+        </li>
+        <li class="li-hover">
+            <div class="divider"></div>
+        </li>
+        <li class="li-hover">
+            <p class="ultra-small margin more-text">Soporte</p>
+        </li>
+        <li>
+            <a href="">
+                <i class="mdi-action-verified-user"></i> Crear caso de soporte
+            </a>
+        </li>
+    </ul>
+    <a href="#" data-activates="slide-out" class="sidebar-collapse btn-floating btn-medium waves-effect waves-light hide-on-large-only cyan">
+        <i class="mdi-navigation-menu"></i>
+    </a>
+</aside>
+<!-- END LEFT SIDEBAR NAV-->

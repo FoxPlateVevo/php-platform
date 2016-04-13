@@ -1,0 +1,102 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItems = $this->storeItems;
+$products   = $this->products;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Productos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/product">Productos</a></li>
+                        <li class="active">Mis Productos</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código de almacén</th>
+                                <th>Tipo de Ingreso</th>
+                                <th>Fecha de registro</th>
+                                <th>Código de Producto</th>
+                                <th>Tipo de Producto</th>
+                                <th>Nombre de Producto</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código de almacén</th>
+                                <th>Tipo de Ingreso</th>
+                                <th>Fecha de registro</th>
+                                <th>Código de Producto</th>
+                                <th>Tipo de Producto</th>
+                                <th>Nombre de Producto</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($storeItems){
+                            _::each($storeItems, function(Store $storeItem) use ($products){
+                                $product = $products[$storeItem->getProductId()];
+                                $finalProduct = $product->finalProduct;
+                                
+//                                $product = new Product;
+//                                $finalProduct = new Course;
+                                ?>
+                                <tr>
+                                    <td><?= $storeItem->getStoreId() ?></td>
+                                    <td><?= $storeItem->getTypeEntry() ?></td>
+                                    <td><?= $storeItem->getRegistryDate() ?></td>
+                                    <td><?= $product->getProductId() ?></td>
+                                    <td><?= $product->getType() ?></td>
+                                    <td><?= $product->getName() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn" href="/store/<?= $storeItem->getStoreId() ?>">Ver</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="6">No hay Productos estructurados de almacén</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

@@ -1,0 +1,123 @@
+<?php
+use Underscore\Underscore as _;
+
+$user                   = $this->user;
+$userProfiles           = $this->userProfiles;
+$userProfileDetails     = $this->userProfileDetails;
+
+$person     = $user->person;
+//$user       = new User();
+//$person       = new NaturalPerson();
+
+$currentUserProfileIds = array_map(function(UserProfileDetail $userProfileDetail){
+    return $userProfileDetail->getUserProfileId();
+}, $userProfileDetails);
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Usuarios</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/user">Usuarios</a></li>
+                        <li class="active">Administrar Perfiles del Usuario</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <div class="row">
+                    <div class="col s12">
+                        <a class="btn cyan waves-effect waves-light" href="/user/<?= $user->getUserId() ?>">Volver</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <table id="user-profile-table" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                            <?php
+                            _::each($userProfiles, function(UserProfile $userProfile) use ($currentUserProfileIds){
+                                $checked = ( in_array($userProfile->getUserProfileId(), $currentUserProfileIds)) ? "checked" : null;
+                                
+                                ?>
+                                <tr data-id="<?= $userProfile->getUserProfileId() ?>">
+                                    <td>
+                                        <input type="checkbox" class="browser-default" value="<?= $userProfile->getUserProfileId() ?>" <?= $checked ?>>
+                                    </td>
+                                    <td><?= $userProfile->getName() ?></td>
+                                    <td><?= $userProfile->getDescription() ?></td>
+                                </tr>
+                                <?php
+                            });
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("#user-profile-table input[type=checkbox]").click(function(e){
+                        var selectedUserProfileIds = [];
+                        
+                        $("#user-profile-table input[type=checkbox]:checked").each(function(){
+                            selectedUserProfileIds.push($(this).val());
+                        });
+                        
+                        $.ajax({
+                            url     : "/user/<?= $user->getUserId() ?>/profile-list",
+                            method  : "POST",
+                            data    : { 
+                                userProfileIds    : selectedUserProfileIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

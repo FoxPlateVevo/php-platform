@@ -1,0 +1,83 @@
+/*-------------------------------
+
+	POPUP.CSS
+
+-------------------------------*/
+
+.popup_back {
+	height: 100%;
+	left: 0;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 100;
+}
+
+.popup_cont {
+	position: fixed;
+	z-index: 102;
+}
+
+.preloader {
+	z-index: 101;
+}
+
+/*---------------------
+
+	EDIT BELOW
+
+*/
+
+.popup_close {
+	color: #888;
+	cursor: pointer;
+	position: absolute;
+	padding: 15px;
+	right: 15px;
+	top: 0;
+}
+
+.popup_close:hover {
+	color: #111;
+}
+
+.popup_back {
+	cursor: pointer;
+	background-color: #222;
+}
+
+div.popup {
+	background: #fff;
+	padding: 20px;
+	box-shadow: 0 3px 10px #222;
+}
+
+.preloader {
+	left: 50%;
+	margin: -10px 0 0 -16px;
+	position: fixed;
+	top: 50%;
+}
+
+
+/*DESKTOP.PHP*/
+#panelPresentacion{
+	width: 80%;
+	display: flex;
+	min-width: 800px;
+	min-height: 500px;
+	flex-direction: column;
+}
+.cardItem{
+    background-color: #f8f8f8;
+    color: #919090;
+    text-align: center;
+    box-shadow: 0px 1px 1px 0px #D9DDE3;
+    width: 180px;
+    padding: .5em;
+    margin: .5em auto;
+    -webkit-user-select: none;
+    font-size: 0.7em;
+}
+.cardItem:hover{box-shadow: 0px 0px 6px 1px #7A7C7F;cursor: pointer;}
+.cardItem span{font-weight: bold;}

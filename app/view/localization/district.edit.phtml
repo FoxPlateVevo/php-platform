@@ -1,0 +1,120 @@
+<?php
+use Underscore\Underscore as _;
+
+$district               = $this->district;
+$districtProvince       = $this->districtProvince;
+$districtDepartament    = $this->districtDepartament;
+$provinces              = $this->provinces;
+$departaments           = $this->departaments;
+$countries              = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Distritos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/localization/district">Distritos</a></li>
+                        <li class="active">Ver Distrito</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12 m12 l6">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12" method="post" action="/localization/district/<?= $district->getId() ?>" name="district-form">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="country-id" data-action="/localization/json/departament-of-country" data-target="departament-id">
+                                            <option value="<?= $districtDepartament->getCountryId() ?>"><?= $countries[$districtDepartament->getCountryId()]->getName() ?></option>
+                                            <?php
+                                            _::each($countries, function(Country $country) use ($districtDepartament){
+                                                if($districtDepartament->getCountryId() !== $country->getId()){
+                                                    ?>
+                                                    <option value="<?= $country->getId() ?>"><?= $country->getName() ?></option>
+                                                    <?php
+                                                }
+                                            });
+                                            ?>
+                                        </select>
+                                        <label>Pais</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="departament-id" data-action="/localization/json/province-of-departament" data-target="district-province">
+                                            <option value="<?= $districtDepartament->getId() ?>"><?= $districtDepartament->getName() ?></option>
+                                            <?php
+                                            _::each($departaments, function(Departament $departament) use ($districtDepartament){
+                                                if($districtDepartament->getId() !== $departament->getId()){
+                                                    ?>
+                                                    <option value="<?= $departament->getId() ?>"><?= $departament->getName() ?></option>
+                                                    <?php
+                                                }
+                                            });
+                                            ?>
+                                        </select>
+                                        <label>Departamento</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="district-province">
+                                            <option value="<?= $districtProvince->getId() ?>"><?= $districtProvince->getName() ?></option>    
+                                            <?php
+                                            _::each($provinces, function(Province $province) use ($districtProvince){
+                                                if($districtProvince->getId() !== $province->getId()){
+                                                    ?>
+                                                    <option value="<?= $province->getId() ?>"><?= $province->getName() ?></option>
+                                                    <?php
+                                                }
+                                            });
+                                            ?>
+                                        </select>
+                                        <label>Provincia</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input id="district-name" type="text" name="district-name" value="<?= $district->getName() ?>">
+                                        <label for="district-name">Nombre de Distrito</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light right" type="submit"> Actualizar
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("form[name=district-form]").chainSelects();
+                });
+            </script>
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

@@ -1,0 +1,113 @@
+<?php
+use Underscore\Underscore as _;
+
+$headquarters = $this->headquarters;
+$districts = $this->districts;
+$provinces = $this->provinces;
+$departaments = $this->departaments;
+$countries = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Sedes</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/localization/headquarter">Sedes</a></li>
+                        <li class="active">Lista de Sedes</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/localization/headquarter/create">Crear Sede</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Dirección</th>
+                                <th>Distrito</th>
+                                <th>Provincia</th>
+                                <th>Departamento</th>
+                                <th>País</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Dirección</th>
+                                <th>Distrito</th>
+                                <th>Provincia</th>
+                                <th>Departamento</th>
+                                <th>País</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($headquarters){
+                            _::each($headquarters, function(Headquarter $headquarter) use ($districts, $provinces, $departaments, $countries){
+                                $district = $districts[$headquarter->getDistrictId()];
+                                $province = $provinces[$district->getProvinceId()];
+                                $departament = $departaments[$province->getDepartamentId()];
+                                $country = $countries[$departament->getCountryId()];
+                                
+                                ?>
+                                <tr>
+                                    <td><?= $headquarter->getHeadquarterId() ?></td>
+                                    <td><?= $headquarter->getDescription() ?></td>
+                                    <td><?= $headquarter->getAddress() ?></td>
+                                    <td><?= $district->getName() ?></td>
+                                    <td><?= $province->getName() ?></td>
+                                    <td><?= $departament->getName() ?></td>
+                                    <td><?= $country->getName() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn" href="/localization/headquarter/<?= $headquarter->getHeadquarterId() ?>">Ver</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="7">No hay sedes</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

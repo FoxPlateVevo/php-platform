@@ -1,0 +1,86 @@
+<?php
+use Underscore\Underscore as _;
+
+$countries  = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Provincias</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/localization/province">Provincias</a></li>
+                        <li class="active">Crear Provincia</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12 m12 l6">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12" method="post" action="/localization/province/create" name="province-form">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="country-id" data-action="/localization/json/departament-of-country" data-target="province-departament">
+                                            <?php
+                                            if($countries){
+                                                _::each($countries, function(Country $country){
+                                                    ?>
+                                                    <option value="<?= $country->getId() ?>"><?= $country->getName() ?></option>
+                                                    <?php
+                                                });
+                                            }
+                                            ?>
+                                        </select>
+                                        <label>Pais</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="province-departament"></select>
+                                        <label>Departamento</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <input id="province-name" type="text" name="province-name">
+                                        <label for="province-name">Nombre de Provincia</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("form[name=province-form]").chainSelects("auto");
+                });
+            </script>
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

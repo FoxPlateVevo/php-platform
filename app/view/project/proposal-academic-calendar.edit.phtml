@@ -1,0 +1,396 @@
+<?php
+
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$proposalAcademicCalendar = $this->proposalAcademicCalendar;
+$responsibleUser          = $this->responsibleUser;  
+$proposalAcademicCalendarRanges = $this->proposalAcademicCalendarRanges;
+$events = $this->events;
+
+$person = $responsibleUser->person;
+
+//$project = new Project();
+//$proposalAcademicCalendar = new ProposalAcademicCalendar();
+
+$proposalProductStructureLink = null;
+
+if($proposalAcademicCalendar->getStatus() === ProposalAcademicCalendar::STATUS_GRANTED){
+    if($project->getStoreId()){
+        $proposalProductStructureLink = "/project/{$project->getProjectId()}/product-structure/{$project->getStoreId()}";
+    }else{
+        $proposalProductStructureLink = "/project/{$project->getProjectId()}/product-structure/create";
+    }
+}
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li class="active">Edición de Propuesta de Calendario Académico</li>
+                        <?php
+                        if ($proposalProductStructureLink) {
+                            ?>
+                            <li><a href="<?= $proposalProductStructureLink ?>">Propuesta de Estructura de Producto</a></li>
+                            <?php
+                        }
+                        ?>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <?php
+            if ($proposalProductStructureLink) {
+                ?>
+                <div class="row">
+                    <div class="col s12 m12 l12">
+                        <div id="card-alert" class="card cyan">
+                            <div class="card-content white-text">
+                                <span class="card-title white-text darken-1">ÉXITO</span>
+                                <p>
+                                    La propuesta de calendario académico fue aprobada, 
+                                    ahora puedes acceder a la estructura del producto.
+                                    Click en <strong>Ir a propuesta</strong>
+                                </p>
+                            </div>
+                            <div class="card-action cyan darken-2">
+                                <a class="waves-effect waves-light btn white-text close">Ok</a>
+                                <a class="waves-effect waves-light btn white-text" href="<?= $proposalProductStructureLink ?>">Ir a propuesta</a>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php
+            }
+            ?>
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12" 
+                                  method="post" 
+                                  action="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $proposalAcademicCalendar->getProposalAcademicCalendarId() ?>"
+                                  id="ca-form">
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <textarea id="ac-description" class="materialize-textarea" name="ac-description"><?= $proposalAcademicCalendar->getDescription() ?></textarea>
+                                        <label for="ac-description" >Descripción de Propuesta de Calendario Académico</label>
+                                    </div>
+                                    <div class="col s6">
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input id="registry-date" class="grey-text" type="text" value="<?= get_fulldate_string($proposalAcademicCalendar->getRegistryDate()) ?>">
+                                                <label for="registry-date">Fecha de Creación</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input id="ac-responsible" class="grey-text" type="text" value="<?= "{$person->getName()}, {$person->getLastName()} {$person->getMotherLastName()}" ?>">
+                                                <label for="ac-responsible">Responsable</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input id="ac-status" class="grey-text" type="text" value="<?= $proposalAcademicCalendar->getStatus() ?>">
+                                                <label for="ac-status">Estado</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row section">
+                            <div class="col s12">
+                                <div class="chip red white-text">
+                                    <i class="mdi-action-stars"></i> Días lectivos
+                                </div>
+                                <div class="chip yellow darken-2 white-text">
+                                    <i class="mdi-action-stars"></i> Días no lectivos
+                                </div>
+                                <div class="chip purple white-text">
+                                    <i class="mdi-action-stars"></i> Vacaciones
+                                </div>
+                                <div class="chip green white-text">
+                                    <i class="mdi-action-stars"></i> Periodo de exámenes
+                                </div>
+                                <div class="chip blue white-text">
+                                    <i class="mdi-action-stars"></i> Periodo de cierre de actas
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-panel" id="date-range-form-container">
+                        <div class="row">
+                            <form class="col s12" 
+                                  method="post" 
+                                  action="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $proposalAcademicCalendar->getProposalAcademicCalendarId() ?>/academic-calendar-range/create">
+                                <h4 class="header2">Crear Rango de fechas</h4>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <select name="range-type">
+                                            <option value="<?= ProposalAcademicCalendarRange::TYPE_SCHOOL_DAY ?>"><?= ProposalAcademicCalendarRange::TYPE_SCHOOL_DAY ?></option>
+                                            <option value="<?= ProposalAcademicCalendarRange::TYPE_NO_SCHOOL_DAY ?>"><?= ProposalAcademicCalendarRange::TYPE_NO_SCHOOL_DAY ?></option>
+                                            <option value="<?= ProposalAcademicCalendarRange::TYPE_VACATION ?>"><?= ProposalAcademicCalendarRange::TYPE_VACATION ?></option>
+                                            <option value="<?= ProposalAcademicCalendarRange::TYPE_EXAM_PERIOD ?>"><?= ProposalAcademicCalendarRange::TYPE_EXAM_PERIOD ?></option>
+                                            <option value="<?= ProposalAcademicCalendarRange::TYPE_CLOSING_ACT ?>"><?= ProposalAcademicCalendarRange::TYPE_CLOSING_ACT ?></option>
+                                        </select>
+                                        <label>Tipo</label>
+                                    </div>
+                                    <div class="input-field col s3">
+                                        <input type="date" class="datepicker" name="range-start-date">
+                                        <label>De</label>
+                                    </div>
+                                    <div class="input-field col s3">
+                                        <input type="date" class="datepicker" name="range-final-date">
+                                        <label>Hasta</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <textarea id="range-description" class="materialize-textarea" name="range-description"></textarea>
+                                        <label for="range-description" >Descripción</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <div class="row">
+                                            <div class="input-field col s12">
+                                                <input name="range-segment-option" type="radio" id="range-segment-option-off" value="off" checked>
+                                                <label for="range-segment-option-off">No segmentar</label>
+                                            </div>
+                                            <div class="input-field col s12">
+                                                <input name="range-segment-option" type="radio" id="range-segment-option-on" value="on">
+                                                <label for="range-segment-option-on">Segmentar en los días...</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s6"></div>
+                                    <div class="input-field col s6">
+                                        <select name="range-segment-quantity">
+                                            <option value="monday">Lunes</option>
+                                            <option value="tuesday">Martes</option>
+                                            <option value="wednesday">Miércoles</option>
+                                            <option value="thursday">Jueves</option>
+                                            <option value="friday">Viernes</option>
+                                            <option value="saturday">Sábado</option>
+                                            <option value="sunday">Domingo</option>
+                                            <option value="tuesday-thursday">Martes y Jueves</option>
+                                            <option value="monday-wednesday-friday">Lunes , Miércoles y Viernes</option>
+                                            <option value="saturday-sunday">Sábado y Domingo</option>
+                                            <option value="monday-to-friday">Lunes a Viernes</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn waves-effect waves-light" type="button" data-cancelable>Cancelar</button>
+                                        <button class="btn waves-effect waves-light" type="submit">Aceptar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <h4 class="header">Rangos de fecha establecidos</h4>
+                    <div class="row">
+                        <div class="col s12">
+                            <button class="btn cyan waves-effect waves-light right" type="button" disabled>Eliminar</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>De</th>
+                                        <th>Hasta</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>De</th>
+                                        <th>Hasta</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    <?php
+                                    if ($proposalAcademicCalendarRanges) {
+                                        _::each($proposalAcademicCalendarRanges, function(ProposalAcademicCalendarRange $proposalAcademicCalendarRange) {
+                                            ?>
+                                            <tr>
+                                                <td><?= $proposalAcademicCalendarRange->getStartDate() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getFinalDate() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getType() ?></td>
+                                                <td><?= $proposalAcademicCalendarRange->getDescription() ?></td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    } else {
+                                        ?>
+                                        <tr>
+                                            <td colspan="4">No hay países</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    var $calendar = $('#calendar'),
+                    $dateRangeFormContainer = $("#date-range-form-container").hide();
+
+                    /*
+                     * Form calendar academic range
+                     */
+                    var $cancelableButton = $dateRangeFormContainer.find("button[data-cancelable]"),
+                    $rangeSegmentOptionRadio = $dateRangeFormContainer.find("input[name=range-segment-option]"),
+                    $rangeSegmentQuantitySelect = $dateRangeFormContainer.find("select[name=range-segment-quantity]");
+
+
+                    $cancelableButton.click(function () {
+                        $dateRangeFormContainer.fadeOut();
+                    });
+
+                    $rangeSegmentOptionRadio.change(function () {
+                        if ($(this).val() === "on") {
+                            $rangeSegmentQuantitySelect.material_select();
+                        } else {
+                            $rangeSegmentQuantitySelect.material_select("destroy");
+                        }
+                    });
+
+                    $dateRangeFormContainer.find("form")
+                    .send(function (response) {
+                        console.log(response);
+                        if (response.events) {
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000);
+
+                            $.each(response.events, function (key, event) {
+                                $calendar.fullCalendar("renderEvent", event);
+                            });
+
+                            $dateRangeFormContainer.fadeOut();
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+
+                    /*
+                     * Form calendar academic
+                     */
+                    $("#ca-form").send(function (success) {
+                        if (success)
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000);
+                    }, "json");
+
+                    /*
+                     * Calendar
+                     */
+                    $calendar.fullCalendar({
+                        //Settings
+                        firstDay: 1,
+                        editable: true,
+                        eventLimit: true, // allow "more" link when too many events
+                        lang: "es",
+                        selectable: true,
+                        selectHelper: true,
+                        timeFormat: "h(:mm)a",
+                        header: {
+                            left: "today prev,next",
+                            center: "title",
+                            right: "newRange basicDay,basicWeek,month"
+                        },
+                        customButtons: {
+                            newRange: {
+                                text: "Agregar un nuevo rango de fechas",
+                                click: function () {
+                                    $rangeSegmentQuantitySelect.material_select("destroy");
+
+                                    $dateRangeFormContainer
+                                            .find("form")
+                                            .get(0)
+                                            .reset();
+
+                                    $dateRangeFormContainer
+                                            .fadeIn()
+                                            .goTo();
+                                }
+                            }
+                        },
+                        //Callbacks
+                        eventClick: function (calEvent, jsEvent, view) {
+                            var dateStartStr = calEvent.start.format("YYYY-MM-DD"),
+                                    dataEndStr = calEvent.end && calEvent.end.format("YYYY-MM-DD");
+
+                            console.log(calEvent.id);
+                            console.log(dateStartStr);
+                            console.log(dataEndStr);
+                        },
+                        select: function (start, end) {
+                            //decrease end date one day
+                            end._d.setDate(end._d.getDate() - 1);
+
+                            var dateStartStr = window.moment(start).format("YYYY-MM-DD"),
+                                    dateEndStr = window.moment(end).format("YYYY-MM-DD");
+
+                            console.log(dateStartStr);
+                            console.log(dateEndStr);
+                        },
+                        events: <?= json_encode($events) ?>
+                    });
+                });
+            </script>
+            <!--fullcalendar CSS-->
+            <link href="/js/vendor/plugins/fullcalendar/css/fullcalendar.min.css" type="text/css" rel="stylesheet" media="screen,projection">
+            <!-- Calendar Script -->
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/lib/moment.min.js"></script>
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/js/fullcalendar.min.js"></script>
+            <script type="text/javascript" src="/js/vendor/plugins/fullcalendar/lib/es.js"></script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

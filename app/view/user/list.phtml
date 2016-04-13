@@ -1,0 +1,104 @@
+<?php
+use Underscore\Underscore as _;
+
+$users = $this->users;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Usuarios</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/user">Usuarios</a></li>
+                        <li class="active">Mis Usuarios</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/user/create">Crear Usuario</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Celular</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Apellidos</th>
+                                <th>Celular</th>
+                                <th>Teléfono</th>
+                                <th>Estado</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($users){
+                            _::each($users, function(User $user){
+                                if($user->getPersonType() === User::PERSON_TYPE_NATURAL){
+                                    $naturalPerson = $user->person;
+                                    ?>
+                                    <tr>
+                                        <td><?= $user->getUserId() ?></td>
+                                        <td><?= $naturalPerson->getName() ?></td>
+                                        <td><?= $naturalPerson->getLastName() . " " . $naturalPerson->getMotherLastName() ?></td>
+                                        <td><?= $user->getCellphone() ?></td>
+                                        <td><?= $user->getPhone() ?></td>
+                                        <td><?= $user->getStatus() ?></td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn" href="/user/<?= $user->getUserId() ?>">Ver</a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay Usuarios</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

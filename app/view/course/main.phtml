@@ -1,0 +1,101 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItem  = $this->storeItem;
+$product    = $this->product;
+$category    = $this->category;
+
+
+//$storeItem = new Store();
+//$product = new Product;
+//$category = new Category();
+
+
+/*
+ * Preview Presentation
+ */
+$htmlPreviewPresentation = "<em>Vista previa no disponible</em>";
+
+if($product->getTypePresentation() === Product::TYPE_PRESENTATION_MULTIMEDIA_FILE){
+    $filename = $product->getContentPresentation();
+    $fileNameExtension = pathinfo($filename, PATHINFO_EXTENSION);
+    $coursePresentationPath = "/resources/upload/products/courses/{$product->getProductId()}/presentation.{$fileNameExtension}";
+    
+    switch ($fileNameExtension){
+        case "mp4":
+            $htmlPreviewPresentation = "<video class='video-presentation' src='{$coursePresentationPath}' controls></video>";
+            break;
+        case "doc":
+        case "docx":
+        case "ppt":
+        case "pptx":
+            //not avaible
+            break;
+        case "pdf":
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$coursePresentationPath}'></iframe>";
+            break;
+        case "jpg":
+        case "png":
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$coursePresentationPath}'>";
+            break;
+    }
+}else if($product->getTypePresentation() === Product::TYPE_PRESENTATION_EMBEDDED_RESOURCE){
+    $htmlPreviewPresentation = null;
+    
+    $content = $product->getContentPresentation();
+    
+    $url = get_url_from_string($content);
+    
+    switch (true){
+        case strpos($url, "youtube"):
+        case strpos($url, "vimeo"):
+        case strpos($url, "google"):
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
+            break;
+        case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$url}'>";
+            break;
+        default:
+            $htmlPreviewPresentation = "<a title='Click aquí' target='_blank' href='{$url}'>Click Aquí para ingresar al vínculo de presentación</a>";
+            break;
+    }
+}
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title"><?= $product->getName() ?></h5>
+                    <ol class="breadcrumbs">
+                        <li class="active"><?= $category->getName() ?></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section" id="board">
+            
+            <div class="row section">
+                <div class="col s12">
+                    <h4 class="header2">Archivo de presentación</h4>
+                    <?= $htmlPreviewPresentation ?>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->
+<script>
+    $(document).ready(function(){
+        
+    });
+</script>

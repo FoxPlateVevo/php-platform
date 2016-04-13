@@ -1,0 +1,68 @@
+<?php
+$new = $this->new;
+?>
+<!-- begin content -->
+<div class="row app-container">
+    <div class="row">
+        <div class="column">
+            <a class="button button-primary" href="/news">Back</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <?php if($new): ?>
+            <h1>Edit New</h1>
+            <form method="post" action="/news/update/<?= $new->getId() ?>">
+                <div class="row">
+                    <div class="six columns">
+                        <label for="txtTitle">Title</label>
+                        <input class="u-full-width" type="text" placeholder="Some Title" id="txtTitle" name="txtTitle" value="<?= $new->getTitle() ?>">
+                    </div>
+                    <div class="six columns">
+                        <label for="txtDate">Date</label>
+                        <input class="u-full-width" type="date" placeholder="Date" id="txtDate" name="txtDate" value="<?= $new->getDateCreate() ?>">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <label for="txtDescription">Description</label>
+                        <textarea class="u-full-width" placeholder="Description..." id="txtDescription" name="txtDescription"><?= $new->getDescription() ?></textarea>
+                    </div>
+                </div>
+                <input class="button-primary" type="submit" value="Update">
+            </form>
+            <?php else: ?>
+            <h1>Create New</h1>
+            <form method="post" action="/news/new">
+                <div class="row">
+                    <div class="six columns">
+                        <label for="txtTitle">Title</label>
+                        <input class="u-full-width" type="text" placeholder="Some Title" id="txtTitle" name="txtTitle">
+                    </div>
+                    <div class="six columns">
+                        <label for="txtDate">Date</label>
+                        <input class="u-full-width" type="date" placeholder="Date" id="txtDate" name="txtDate">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="six columns">
+                        <label for="cboStatus">Status</label>
+                        <select class="u-full-width" id="cboStatus" name="cboStatus">
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        <label for="txtDescription">Description</label>
+                        <textarea class="u-full-width" placeholder="Description..." id="txtDescription" name="txtDescription"></textarea>
+                    </div>
+                </div>
+                <input class="button-primary" type="submit" value="Submit">
+            </form>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+<!-- end content -->

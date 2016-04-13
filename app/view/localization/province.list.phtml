@@ -1,0 +1,101 @@
+<?php
+use Underscore\Underscore as _;
+
+$provinces = $this->provinces;
+$departaments = $this->departaments;
+$countries = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Provincias</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/localization/province">Provincia</a></li>
+                        <li class="active">Lista de Provincias</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/localization/province/create">Crear Provincia</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Departamento</th>
+                                <th>País</th>
+                                <th>Opción</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Departamento</th>
+                                <th>País</th>
+                                <th>Opción</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($provinces){
+                            _::each($provinces, function(Province $province) use ($departaments, $countries){
+                                $departament = $departaments[$province->getDepartamentId()];
+                                $country = $countries[$departament->getCountryId()];
+                                ?>
+                                <tr>
+                                    <td><?= $province->getId() ?></td>
+                                    <td><?= $province->getName() ?></td>
+                                    <td><?= $departament->getName() ?></td>
+                                    <td><?= $country->getName() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn" href="/localization/province/<?= $province->getId() ?>">Ver</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay provincias</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

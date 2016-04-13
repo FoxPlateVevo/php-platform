@@ -1,0 +1,94 @@
+<?php
+use Underscore\Underscore as _;
+
+$countries  = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Países</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/localization/country">Países</a></li>
+                        <li class="active">Lista de Países</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/localization/country/create">Crear País</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Código Postal</th>
+                                <th>Opción</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Código Postal</th>
+                                <th>Opción</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($countries){
+                            _::each($countries, function(Country $country){
+                                ?>
+                                <tr>
+                                    <td><?= $country->getId() ?></td>
+                                    <td><?= $country->getName() ?></td>
+                                    <td><?= $country->getPostalCode() ?></td>
+                                    <td>
+                                        <a class="waves-effect waves-light btn" href="/localization/country/<?= $country->getId() ?>">Ver</a>
+                                    </td>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay países</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

@@ -1,0 +1,174 @@
+<?php
+use Underscore\Underscore as _;
+
+$countries  = $this->countries;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Usuarios</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/user">Usuarios</a></li>
+                        <li class="active">Crear Usuario</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+                        
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" action="/user/create" name="user-form">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="person-type" type="text" value="Persona Natural" disabled>
+                                <label for="person-type">Tipo de Persona</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="registry-date" type="text" value="<?= get_datetime() ?>" disabled>
+                                <label for="registry-date">Fecha de registro</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-dni" type="text" name="user-dni">
+                                <label for="user-dni">DNI</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-name" type="text" name="user-name">
+                                <label for="user-name">Nombres</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-lastname" type="text" name="user-lastname">
+                                <label for="user-lastname">Apellido Paterno</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-mother-lastname" type="text" name="user-mother-lastname">
+                                <label for="user-mother-lastname">Apellido Materno</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input type="date" class="datepicker" name="user-birth-date">
+                                <label>Fecha de Nacimiento</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="user-civil-status">
+                                    <option value="<?= NaturalPerson::CIVIL_STATUS_SINGLE ?>"><?= NaturalPerson::CIVIL_STATUS_SINGLE ?></option>
+                                    <option value="<?= NaturalPerson::CIVIL_STATUS_COHABITANT ?>"><?= NaturalPerson::CIVIL_STATUS_COHABITANT ?></option>
+                                    <option value="<?= NaturalPerson::CIVIL_STATUS_MARRIED ?>"><?= NaturalPerson::CIVIL_STATUS_MARRIED ?></option>
+                                    <option value="<?= NaturalPerson::CIVIL_STATUS_WIDOWER ?>"><?= NaturalPerson::CIVIL_STATUS_WIDOWER ?></option>
+                                </select>
+                                <label>Estado Civil</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label class="active">Situación Laboral</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" id="user-employment-status-dependent" value="<?= NaturalPerson::EMPLOYMENT_STATUS_DEPENDENT ?>" checked>
+                                <label for="user-employment-status-dependent"><?= NaturalPerson::EMPLOYMENT_STATUS_DEPENDENT ?></label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" id="user-employment-status-independent" value="<?= NaturalPerson::EMPLOYMENT_STATUS_INDEPENDENT ?>">
+                                <label for="user-employment-status-independent"><?= NaturalPerson::EMPLOYMENT_STATUS_INDEPENDENT ?></label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" id="user-employment-status-retired" value="<?= NaturalPerson::EMPLOYMENT_STATUS_RETIRED ?>">
+                                <label for="user-employment-status-retired"><?= NaturalPerson::EMPLOYMENT_STATUS_RETIRED ?></label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-email" type="email" name="user-email">
+                                <label for="user-email">Email</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-website" type="text" name="user-website">
+                                <label for="user-website">Sitio Web</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="country-id" data-action="/localization/json/departament-of-country" data-target="departament-id">
+                                    <?php
+                                    if($countries){
+                                        _::each($countries, function(Country $country){
+                                            ?>
+                                            <option value="<?= $country->getId() ?>"><?= $country->getName() ?></option>
+                                            <?php
+                                        });
+                                    }
+                                    ?>
+                                </select>
+                                <label>Pais</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="departament-id" data-action="/localization/json/province-of-departament" data-target="province-id"></select>
+                                <label>Departamento</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="province-id" data-action="/localization/json/district-of-province" data-target="user-district-id"></select>
+                                <label>Provincia</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="user-district-id"></select>
+                                <label>Distrito</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="user-address" type="text" name="user-address">
+                                <label for="user-address">Dirección</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-cellphone" type="text" name="user-cellphone">
+                                <label for="user-cellphone">Celular</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-phone" type="text" name="user-phone">
+                                <label for="user-phone">Teléfono</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("form[name=user-form]").chainSelects("auto");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

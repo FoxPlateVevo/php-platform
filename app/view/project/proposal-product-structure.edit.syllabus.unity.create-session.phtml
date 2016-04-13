@@ -1,0 +1,144 @@
+<?php
+
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+$professors = $this->professors;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <?php
+            if (!$professors) {
+                ?>
+                <div class="card light-blue">
+                    <div class="card-content white-text">
+                        <span class="card-title">Información</span>
+                        <p>
+                            Antes de crear una sesión debes añadir 
+                            un docente en la estructura del curso
+                        </p>
+                    </div>
+                    <div class="card-action">
+                        <a
+                            href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/professor-detail"
+                            class="lime-text text-accent-1">Añadir Docente</a>
+                    </div>
+                </div>    
+                <?php
+            }
+            ?>
+            <div class="card-panel">
+                <p class="caption">Crear Sesión</p>
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="create-session"
+                          name="session-form">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="name" type="text" name="name">
+                                <label for="name">Nombre de la sesión</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="professor-exhibitor-user-id">
+                                    <?php
+                                    _::each($professors, function(User $professor) {
+                                        $person = $professor->person;
+//                                        $person = new NaturalPerson();
+                                        ?>
+                                        <option value="<?= $professor->getUserId() ?>"><?= substr_with_dots("{$person->getName()}, {$person->getLastName()} {$person->getMotherLastName()}", 40) ?></option>    
+                                        <?php
+                                    });
+                                    ?>
+                                </select>
+                                <label>Docente Expositor</label>
+                            </div>
+                            <div class="col s6 input-field">
+                                <label>Periodo de Disponibilidad</label>
+                                <br>
+                                <br>
+                                <div class="row">
+                                    <div class="input-field col s6">
+                                        <input type="date" class="datepicker" name="availability-start-date">
+                                        <label>De</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input type="date" class="datepicker" name="availability-final-date">
+                                        <label>Hasta</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="position">
+                                    <option value="1">1</option>
+                                </select>
+                                <label>Posición</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    /*
+                     * Form
+                     */
+                    $("form[name=session-form]").send(function (response) {
+                        console.log(response);
+                        if (response.success) {
+                            window.Materialize.toast("Se guardaron los datos correctamente", 1000, "", function () {
+                                window.location = response.URIredirect;
+                            });
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

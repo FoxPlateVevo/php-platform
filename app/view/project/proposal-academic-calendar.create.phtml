@@ -1,0 +1,64 @@
+<?php
+$projectId = $this->projectId;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li class="active">Crear Propuesta de Calendario Académico</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <h4 class="header">Haz iniciado un nuevo proyecto!</h4>
+            <p class="caption">
+                Necesitas crear una propuesta de calendario académico
+            </p>
+            <div class="divider"></div>
+            
+            <div class="row">
+                <div class="col s12 m12 l6">
+                    <div class="card-panel">
+                        <div class="row">
+                            <form class="col s12" method="post" action="/project/<?= $projectId ?>/academic-calendar/create">
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <textarea id="ac-description" class="materialize-textarea" name="ac-description"></textarea>
+                                        <label for="ac-description" >Descripción de Propuesta de Calendario Académico</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                            <i class="mdi-content-send right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

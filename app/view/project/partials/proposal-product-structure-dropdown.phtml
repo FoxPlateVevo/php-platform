@@ -1,0 +1,60 @@
+<?php
+$project    = $this->project;
+$product    = $this->product;
+
+//$project = new Project;
+//$product = new Product;
+
+if($product instanceof Product && $project instanceof Project){
+    $finalProduct = $product->finalProduct;
+    
+    $baseURI = "/project/{$project->getProjectId()}/product-structure/{$project->getStoreId()}";
+    
+    ?>
+    <!--dropdown select-->
+    <ul id='dropdown-select' class='dropdown-content'>
+        <li>
+            <a href="<?= $baseURI ?>">Información General</a>
+        </li>
+        <li>
+            <a href="<?= $baseURI ?>/presentation">Presentación</a>
+        </li>
+        <?php
+            if($finalProduct instanceof Program){
+                ?>
+                <li>
+                    <a href="<?= $baseURI ?>/curriculum">Currícula</a>
+                </li>
+                <?php
+            }else if($finalProduct instanceof Course){
+                ?>
+                <li>
+                    <a href="<?= $baseURI ?>/syllabus">Syllabus</a>
+                </li>
+                <li>
+                    <a href="<?= $baseURI ?>/educative-resource">Recursos Educativos</a>
+                </li>
+                <?php
+            }
+        ?>
+        <li>
+            <a href="<?= $baseURI ?>/group">Grupos</a>
+        </li>
+        <li>
+            <a href="<?= $baseURI ?>/professor-detail">Plantel Docente</a>
+        </li>
+        <li>
+            <a href="<?= $baseURI ?>/academic-staff-management-detail">Plantel de Gestión Académica</a>
+        </li>
+        <li>
+            <a href="<?= $baseURI ?>/certification">Certificación</a>
+        </li>
+    </ul>
+    <!--end dropdown select-->
+    <a class="btn cyan waves-effect waves-light" href="/store/<?= $project->getStoreId() ?>/register">Registrar Producto</a>
+    <?php
+}else{
+    ?>
+    <strong>Se importo el dropdown navegador del proyecto, pero ha ocurrido un error</strong>
+    <?php
+}

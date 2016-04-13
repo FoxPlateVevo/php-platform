@@ -1,0 +1,83 @@
+<?php
+extract((array) $this->sharedData()->all(), EXTR_PREFIX_ALL, "_");
+
+switch ($__message){
+    case "no_updated":
+        $__message = "error: New no updated!";
+        break;
+    case "updated":
+        $__message = "New updated!";
+        break;
+    case "no_deleted":
+        $__message = "error: New no deleted!";
+        break;
+    case "deleted":
+        $__message = "New deleted!";
+        break;
+    case "no_created":
+        $__message = "error: New no created!";
+        break;
+    case "created":
+        $__message = "New created!";
+        break;
+    default:
+        $__message = null;
+        null;
+}
+?>
+<!-- begin content -->
+<div class="row app-container">
+    <div class="row">
+        <div class="column">
+            <a class="button button-primary" href="/news/create">Create</a>
+        </div>
+    </div>
+    <?php if($__message): ?> 
+    <div class="row">
+        <div class="column">
+            <div>
+                <?= $__message ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?> 
+    <div class="row">
+        <div class="column">
+            <h1>News</h1>
+            <table class="u-full-width news-list">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th class="display">Date Create</th>
+                        <th class="display">Status</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($__news as $new): ?>
+                        <tr>
+                            <td>
+                                <?= $new->getId() ?>
+                            </td>
+                            <td>
+                                <?= substr($new->getTitle(), 0, 20) ?>...
+                            </td>
+                            <td class="display">
+                                <?= $new->getDateCreate() ?>
+                            </td>
+                            <td class="display">
+                                <?= $new->getStatus() ?>
+                            </td>
+                            <td>
+                                <a href="/news/edit/<?= $new->getId() ?>">Edit</a>
+                                <a href="/news/delete/<?= $new->getId() ?>">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- end content -->

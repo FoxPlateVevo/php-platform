@@ -1,0 +1,180 @@
+<?php
+use Underscore\Underscore as _;
+
+$project        = $this->project;
+$headquarters   = $this->headquarters;
+$categories     = $this->categories;
+
+//$project = new Project();
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <h4 class="header">Crear propuesta de estructura de producto</h4>
+            <p class="caption">
+                Vamos a comenzar... Definamos la información general del producto a estructurar
+            </p>
+            <div class="divider"></div>
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="/project/<?= $project->getProjectId() ?>/product-structure/create" 
+                          name="product-form">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="product-name" type="text" name="product-name">
+                                <label for="product-name">Nombre del Producto</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input type="date" class="datepicker" name="product-start-date">
+                                <label>Fecha de Inicio</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input type="date" class="datepicker" name="product-final-date">
+                                <label>Fecha Final</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="product-type">
+                                    <option value="<?= Product::TYPE_PRODUCT_PROGRAM ?>"><?= Product::TYPE_PRODUCT_PROGRAM ?></option>
+                                    <option value="<?= Product::TYPE_PRODUCT_COURSE ?>"><?= Product::TYPE_PRODUCT_COURSE ?></option>
+                                </select>
+                                <label>Tipo de Producto</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="product-headquarter-id">
+                                    <?php
+                                    if($headquarters){
+                                        _::each($headquarters, function(Headquarter $headquarter){
+                                            ?>
+                                                <option value="<?= $headquarter->getHeadquarterId() ?>"><?= substr_with_dots($headquarter->getDescription(), 40) ?></option>
+                                            <?php
+                                        });
+                                    }
+                                    ?>
+                                </select>
+                                <label>Sede</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s6">
+                                <div class="row" data-parent>
+                                    <div class="input-field col s12">
+                                        <select name="product-program-type">
+                                            <option value="<?= Program::TYPE_DIPLOMAED ?>"><?= Program::TYPE_DIPLOMAED ?></option>
+                                            <option value="<?= Program::TYPE_SEMINARY ?>"><?= Program::TYPE_SEMINARY ?></option>
+                                        </select>
+                                        <label>Tipo de Programa</label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <select name="product-category-id">
+                                            <?php
+                                            if($categories){
+                                                _::each($categories, function(Category $category){
+                                                    ?>
+                                                        <option value="<?= $category->getCategoryId() ?>"><?= $category->getName() ?></option>
+                                                    <?php
+                                                });
+                                            }
+                                            ?>
+                                        </select>
+                                        <label>Categoria</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-field col s6">
+                                <textarea id="product-information" class="materialize-textarea" name="product-information"></textarea>
+                                <label for="product-information" >Información del Producto</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <textarea id="product-objective" class="materialize-textarea" name="product-objective"></textarea>
+                                <label for="product-objective" >Objetivo</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <textarea id="product-public-objective" class="materialize-textarea" name="product-public-objective"></textarea>
+                                <label for="product-public-objective" >Público Objetivo</label>
+                            </div>
+                        </div>
+                        <div class="row" data-parent>
+                            <div class="input-field col s6">
+                                <textarea id="product-course-professor-profile-information" class="materialize-textarea" name="product-course-professor-profile-information"></textarea>
+                                <label for="product-course-professor-profile-information" >Perfil Docente</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    var $productForm = $("form[name=product-form]"),
+                    $typeProgramSelect = $productForm.find("select[name=product-program-type]"),
+                    $courseProfessorProfileInformationParent = $productForm.find("[name=product-course-professor-profile-information]")
+                    .closest("[data-parent]")
+                    .hide();
+                    
+                    $productForm.find("select[name=product-type]").change(function(){
+                        if($(this).val() === "PROGRAMA"){
+                            $typeProgramSelect.closest("[data-parent]").show();
+                            $typeProgramSelect.material_select();
+                            $courseProfessorProfileInformationParent.hide();
+                        }else{
+                            $typeProgramSelect.closest("[data-parent]").hide();
+                            $typeProgramSelect.material_select("destroy");
+                            $courseProfessorProfileInformationParent.show();
+                        }
+                    });
+                    
+                    $productForm.send(function (response) {
+                        console.log(response);
+                        if (response.URIredirect) {
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000, "", function(){
+                                window.location = response.URIredirect;
+                            });
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

@@ -1,0 +1,181 @@
+<?php
+use Underscore\Underscore as _;
+
+$project    = $this->project;
+$product    = $this->product;
+$users      = $this->users;
+$currentStaffMemberUserIds  = $this->currentStaffMemberUserIds;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <div class="row">
+                    <div class="col s12">
+                        <a class="btn cyan waves-effect waves-light" href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/academic-staff-management-detail">Volver</a>
+                    </div>
+                </div>
+                <div class="row section">
+                    <div class="col s12">
+                        <table id="member-table" class="responsive-table display" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Código</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>DNI</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Edad</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th></th>
+                                    <th>Código</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>DNI</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Edad</th>
+                                    <th>Email</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                            <?php
+                            $existsStaffMembersAvaibles = false;
+                            
+                            if($users){
+                                _::each($users, function(User $user) use ($currentStaffMemberUserIds){
+                                    if(in_array($user->getUserId(), $currentStaffMemberUserIds)){
+                                        return;
+                                    }
+                                    
+                                    $existsStaffMembersAvaibles = true;
+                                    
+                                    $person = $user->person;
+//                                    $person = new NaturalPerson();
+                                    
+                                    $birthYear      = (int) date_create($person->getBirthDate())->format("Y");
+                                    $currentYear    = (int) date("Y");
+                                    $age = $currentYear - $birthYear;
+                                    
+                                    ?>
+                                    <tr data-id="<?= $user->getUserId() ?>">
+                                        <td>
+                                            <input type="checkbox" class="browser-default" value="<?= $user->getUserId() ?>">
+                                        </td>
+                                        <td><?= $user->getUserId() ?></td>
+                                        <td><?= $person->getName() ?></td>
+                                        <td><?= $person->getLastName() . " " . $person->getMotherLastName() ?></td>
+                                        <td><?= $person->getDni() ?></td>
+                                        <td><?= $person->getBirthDate() ?></td>
+                                        <td><?= $age ?></td>
+                                        <td><?= $user->getEmail() ?></td>
+                                    </tr>
+                                    <?php
+                                });
+                            }
+                            
+                            if(!$existsStaffMembersAvaibles){
+                                ?>
+                                <tr>
+                                    <td colspan="8">No hay personales disponibles</td>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <button class="btn cyan waves-effect waves-light right" type="button" id="select-button" disabled>Seleccionar</button>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    var $button = $("#select-button");
+                    
+                    $button.click(function(){
+                        var selectedUserIds = [];
+                        
+                        $("#member-table input[type=checkbox]:checked").each(function(){
+                            selectedUserIds.push($(this).val());
+                        });
+                        
+                        $.ajax({
+                            url     : "/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/academic-staff-management-detail/add-staff-member",
+                            method  : "POST",
+                            data    : { 
+                                userIds: selectedUserIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location = "/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/academic-staff-management-detail";
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                    
+                    $("#member-table input[type=checkbox]").click(function(e){
+                        var selectedUserIds = [];
+                        
+                        $("#member-table input[type=checkbox]:checked").each(function(){
+                            selectedUserIds.push($(this).val());
+                        });
+                        
+                        if(selectedUserIds.length){
+                            $button.attr("disabled", false);
+                        }else{
+                            $button.attr("disabled", true);
+                        }
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

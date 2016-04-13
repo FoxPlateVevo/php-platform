@@ -1,0 +1,106 @@
+<?php
+use Underscore\Underscore as _;
+
+$projects = $this->projects;
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li class="active">Mis Proyectos</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+
+            <div class="row">
+                <div class="col s12">
+                    <a class="waves-effect waves-light btn" href="/project/create">Crear Proyecto</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col s12">
+                    <table id="data-table-simple" class="responsive-table display" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Fecha de Registro</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Código</th>
+                                <th>Fecha de Registro</th>
+                                <th>Estado</th>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                        <?php
+                        if($projects){
+                            _::each($projects, function(Project $project){
+                                ?>
+                                <tr>
+                                    <td><?= $project->getProjectId() ?></td>
+                                    <td><?= $project->getRegistryDate() ?></td>
+                                    <td><?= $project->getStatus() ?></td>
+                                    <?php
+                                        if($project->getACproposalId()){
+                                            ?>
+                                            <td>
+                                                <a class="waves-effect waves-light btn" 
+                                                   href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Ver</a>
+                                            </td>
+                                            <?php
+                                        }else{
+                                            ?>
+                                            <td>
+                                                <a class="waves-effect waves-light btn cyan" 
+                                                   href="/project/<?= $project->getProjectId() ?>/academic-calendar/create">Continuar</a>
+                                            </td>
+                                            <?php
+                                        }
+                                    ?>
+                                </tr>
+                                <?php
+                            });
+                        }else{
+                            ?>
+                            <tr>
+                                <td colspan="4">No hay Proyectos</td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function () {
+
+                });
+            </script>
+
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

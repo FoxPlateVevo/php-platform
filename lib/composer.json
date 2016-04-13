@@ -1,0 +1,6 @@
+{
+    "require": {
+        "klein/klein"               : "dev-master",
+        "bdelespierre/underscore"   : "dev-master"
+    }
+}

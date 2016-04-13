@@ -1,0 +1,106 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+$categories = $this->categories;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <h4 class="header2">Crear Material</h4>
+                <p class="caption">Embebido</p>
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="create-embedded-material"
+                          name="material-form">
+                        <div class="row">
+                            <div class="col s12 input-field">
+                                <input type="text" name="name">
+                                <label>Nombre de Material</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12 input-field">
+                                <select name="category-id">
+                                    <?php
+                                    _::each($categories, function(Category $category) {
+                                        ?>
+                                    <option value="<?= $category->getCategoryId() ?>"><?= $category->getName() ?></option>
+                                        <?php
+                                    });
+                                    ?>
+                                </select>
+                                <label>Sede</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <textarea id="embedded-content" class="materialize-textarea" name="embedded-content"></textarea>
+                                <label for="embedded-content" >Contenido embebido</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Registrar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * Form
+                     */
+                    $("form[name=material-form]").send(function (response) {
+                        console.log(response);
+                        if (response.success){
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000, "", function(){
+                                window.location = response.URIredirect;
+                            });
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

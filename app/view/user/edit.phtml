@@ -1,0 +1,246 @@
+<?php
+use Underscore\Underscore as _;
+
+$user       = $this->user;
+$person     = $user->person;
+//$user       = new User();
+//$person       = new NaturalPerson();
+$userDistrict           = $this->userDistrict;
+$userProvince           = $this->userProvince;
+$userDepartament        = $this->userDepartament;
+$districts              = $this->districts;
+$provinces              = $this->provinces;
+$departaments           = $this->departaments;
+$countries              = $this->countries;
+
+$civilStatus = [
+    NaturalPerson::CIVIL_STATUS_SINGLE,
+    NaturalPerson::CIVIL_STATUS_COHABITANT,
+    NaturalPerson::CIVIL_STATUS_MARRIED,
+    NaturalPerson::CIVIL_STATUS_WIDOWER
+];
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Usuarios</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/user">Usuarios</a></li>
+                        <li class="active">Ver Usuario</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="row">
+                <div class="col s12">
+                    <a class="btn cyan waves-effect waves-light" href="/user/<?= $user->getUserId() ?>/profile-list">Administrar Perfiles de usuario</a>
+                </div>
+            </div>
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" action="/user/<?= $user->getUserId() ?>" name="user-form">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="person-type" type="text" value="<?= $user->getPersonType() ?>" disabled>
+                                <label for="person-type">Tipo de Persona</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="registry-date" type="text" value="<?= $user->getRegistryDate() ?>" disabled>
+                                <label for="registry-date">Fecha de registro</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-dni" type="text" name="user-dni" value="<?= $person->getDni() ?>">
+                                <label for="user-dni">DNI</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-name" type="text" name="user-name" value="<?= $person->getName() ?>">
+                                <label for="user-name">Nombres</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-lastname" type="text" name="user-lastname" value="<?= $person->getLastName() ?>">
+                                <label for="user-lastname">Apellido Paterno</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-mother-lastname" type="text" name="user-mother-lastname" value="<?= $person->getMotherLastName() ?>">
+                                <label for="user-mother-lastname">Apellido Materno</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input type="date" class="datepicker" name="user-birth-date" value="<?= $person->getBirthDate() ?>">
+                                <label>Fecha de Nacimiento</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="user-civil-status">
+                                    <option value="<?= $person->getCivilStatus() ?>"><?= $person->getCivilStatus() ?></option>
+                                    <?php
+                                    _::each($civilStatus, function($cs) use ($person){
+                                        if($person->getCivilStatus() !== $cs){
+                                            ?>
+                                                <option value="<?= $cs ?>"><?= $cs ?></option>
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Estado Civil</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <label class="active">Situación Laboral</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" 
+                                       id="user-employment-status-dependent" 
+                                       value="<?= NaturalPerson::EMPLOYMENT_STATUS_DEPENDENT ?>" 
+                                       <?= $person->getEmploymentStatus() === NaturalPerson::EMPLOYMENT_STATUS_DEPENDENT ? "checked" : null ?>>
+                                <label for="user-employment-status-dependent"><?= NaturalPerson::EMPLOYMENT_STATUS_DEPENDENT ?></label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" 
+                                       id="user-employment-status-independent" 
+                                       value="<?= NaturalPerson::EMPLOYMENT_STATUS_INDEPENDENT ?>"
+                                       <?= $person->getEmploymentStatus() === NaturalPerson::EMPLOYMENT_STATUS_INDEPENDENT ? "checked" : null ?>>
+                                <label for="user-employment-status-independent"><?= NaturalPerson::EMPLOYMENT_STATUS_INDEPENDENT ?></label>
+                            </div>
+                            <div class="input-field col s12">
+                                <input name="user-employment-status" type="radio" 
+                                       id="user-employment-status-retired" 
+                                       value="<?= NaturalPerson::EMPLOYMENT_STATUS_RETIRED ?>"
+                                       <?= $person->getEmploymentStatus() === NaturalPerson::EMPLOYMENT_STATUS_RETIRED ? "checked" : null ?>>
+                                <label for="user-employment-status-retired"><?= NaturalPerson::EMPLOYMENT_STATUS_RETIRED ?></label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-email" type="email" name="user-email" value="<?= $user->getEmail() ?>">
+                                <label for="user-email">Email</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-website" type="text" name="user-website" value="<?= $user->getWebsite() ?>">
+                                <label for="user-website">Sitio Web</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="country-id" data-action="/localization/json/departament-of-country" data-target="departament-id">
+                                    <option value="<?= $userDepartament->getCountryId() ?>"><?= $countries[$userDepartament->getCountryId()]->getName() ?></option>
+                                    <?php
+                                    _::each($countries, function(Country $country) use ($userDepartament){
+                                        if($userDepartament->getCountryId() !== $country->getId()){
+                                            ?>
+                                            <option value="<?= $country->getId() ?>"><?= $country->getName() ?></option>
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Pais</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="departament-id" data-action="/localization/json/province-of-departament" data-target="province-id">
+                                    <option value="<?= $userDepartament->getId() ?>"><?= $userDepartament->getName() ?></option>
+                                    <?php
+                                    _::each($departaments, function(Departament $departament) use ($userDepartament){
+                                        if($userDepartament->getId() !== $departament->getId()){
+                                            ?>
+                                            <option value="<?= $departament->getId() ?>"><?= $departament->getName() ?></option>
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Departamento</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <select name="province-id" data-action="/localization/json/district-of-province" data-target="user-district-id">
+                                    <option value="<?= $userProvince->getId() ?>"><?= $userProvince->getName() ?></option>    
+                                    <?php
+                                    _::each($provinces, function(Province $province) use ($userProvince){
+                                        if($userProvince->getId() !== $province->getId()){
+                                            ?>
+                                            <option value="<?= $province->getId() ?>"><?= $province->getName() ?></option>
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Provincia</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <select name="user-district-id">
+                                    <option value="<?= $userDistrict->getId() ?>"><?= $userDistrict->getName() ?></option>    
+                                    <?php
+                                    _::each($districts, function(District $district) use ($userDistrict){
+                                        if($userDistrict->getId() !== $district->getId()){
+                                            ?>
+                                            <option value="<?= $district->getId() ?>"><?= $district->getName() ?></option>
+                                            <?php
+                                        }
+                                    });
+                                    ?>
+                                </select>
+                                <label>Distrito</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <input id="user-address" type="text" name="user-address" value="<?= $user->getAddress() ?>">
+                                <label for="user-address">Dirección</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="user-cellphone" type="text" name="user-cellphone" value="<?= $user->getCellphone() ?>">
+                                <label for="user-cellphone">Celular</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="user-phone" type="text" name="user-phone" value="<?= $user->getPhone() ?>">
+                                <label for="user-phone">Teléfono</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Actualizar
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $("form[name=user-form]").chainSelects();
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

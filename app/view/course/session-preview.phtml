@@ -1,0 +1,63 @@
+<?php
+use Underscore\Underscore as _;
+
+$material = $this->material;
+$unit   = $this->unit;
+$session = $this->session;
+
+//$material = new Material;
+//$unit = new Unity;
+//$session = new Session;
+
+/*
+ * Preview Presentation
+ */
+$htmlPreviewPresentation = "<em>Vista previa no disponible</em>";
+
+if($material->getType() === Material::TYPE_MULTIMEDIA_FILE){
+    $filename = $material->getContent();
+    $fileNameExtension = pathinfo($filename, PATHINFO_EXTENSION);
+    $materialPresentationPath = "/resources/upload/materials/{$material->getMaterialId()}.{$fileNameExtension}";
+
+    switch ($fileNameExtension){
+        case "mp4":
+            $htmlPreviewPresentation = "<video class='video-presentation' src='{$materialPresentationPath}' controls></video>";
+            break;
+        case "doc":
+        case "docx":
+        case "ppt":
+        case "pptx":
+            //not avaible
+            break;
+        case "pdf":
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$materialPresentationPath}'></iframe>";
+            break;
+        case "jpg":
+        case "png":
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$materialPresentationPath}'>";
+            break;
+    }
+}else if($material->getType() === Material::TYPE_EMBEDDED_RESOURCE){
+    $htmlPreviewPresentation = null;
+
+    $content = $material->getContent();
+
+    $url = get_url_from_string($content);
+
+    switch (true){
+        case strpos($url, "youtube"):
+        case strpos($url, "vimeo"):
+        case strpos($url, "google"):
+            $htmlPreviewPresentation = "<iframe class='iframe-presentation' src='{$url}'></iframe>";
+            break;
+        case in_array(pathinfo($url, PATHINFO_EXTENSION), ["png", "jpg"]):
+            $htmlPreviewPresentation = "<img class='image-presentation' src='{$url}'>";
+            break;
+        default:
+            $htmlPreviewPresentation = "<a title='Click aquí' target='_blank' href='{$url}'>Click Aquí para ingresar al vínculo de presentación</a>";
+            break;
+    }
+}
+?>
+<h4 class="header2"><?= "{$unit->getName()} - {$session->getName()}" ?></h4>
+<?= $htmlPreviewPresentation ?>

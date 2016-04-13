@@ -1,0 +1,101 @@
+<?php
+use Underscore\Underscore as _;
+
+$project = $this->project;
+$product = $this->product;
+
+$finalProduct = $product->finalProduct;
+
+//$project = new Project();
+//$product = new Product;
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Proyectos</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project">Proyectos</a></li>
+                        <li><a href="/project/<?= $project->getProjectId() ?>/academic-calendar/<?= $project->getACproposalId() ?>">Edición de Propuesta de Calendario Académico</a></li>
+                        <li class="active">Propuesta de Estructura de Producto</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <!--dropdown select-->
+            <a class='dropdown-button btn' data-activates='dropdown-select'>Certificación</a>
+            <?= $this->partial(__PATH__ . "/app/view/project/partials/proposal-product-structure-dropdown.phtml"); ?>
+            <!--end dropdown select-->
+            <h4 class="header2">Datos de Certificación</h4>
+            <p class="caption">Información que se tomará en cuenta para la certificación en el producto</p>
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" method="post" 
+                          action="/project/<?= $project->getProjectId() ?>/product-structure/<?= $project->getStoreId() ?>/certification" 
+                          name="certification-form">
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <input id="minimun-grade" type="text" name="minimun-grade" value="<?= $product->getMinimunGrade() ?>">
+                                <label for="minimun-grade">Nota mínima</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input id="maximun-grade" type="text" name="maximun-grade" value="<?= $product->getMaximunGrade() ?>">
+                                <label for="maximun-grade">Nota máxima</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <textarea id="evaluative-system-information" class="materialize-textarea" name="evaluative-system-information"><?= $product->getEvaluativeSystemInformation() ?></textarea>
+                                <label for="evaluative-system-information">Sistema evaluativo</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <textarea id="diploma-information" class="materialize-textarea" name="diploma-information"><?= $product->getDiplomaInformation() ?></textarea>
+                                <label for="diploma-information">Acerca de los diplomas</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * Form
+                     */
+                    $("form[name=certification-form]").send(function (response) {
+                        console.log(response);
+                        if (response.success){
+                            window.Materialize.toast("Se guardaron los datos correctamente", 3000);
+                        } else {
+                            window.Materialize.toast(response.message, 3000);
+                        }
+                    }, "json");
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->

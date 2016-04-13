@@ -1,0 +1,383 @@
+<?php
+use Underscore\Underscore as _;
+
+$storeItem = $this->storeItem;
+$project = $this->project;
+$product = $this->product;
+$discounts = $this->discounts;
+$interests = $this->interests;
+
+$finalProduct = $product->finalProduct;
+
+//$storeItem = new Store();
+//$project = new Project();
+//$product = new Product;
+
+/*
+ * Upload
+ */
+$uploadToken = create_upload_token("/store/{$storeItem->getStoreId()}/presentation/presentation", 2, [
+    "doc", 
+    "docx",
+    "ppt", 
+    "pptx", 
+    "pdf", 
+    "jpg", 
+    "png"
+]);
+
+/*
+ * Prefiles
+ */
+$prefile = [];
+
+if($storeItem->getSaleContentPresentation()){
+    $uri = null;
+    $fileNameExtension = pathinfo($storeItem->getSaleContentPresentation(), PATHINFO_EXTENSION);
+    
+    if($fileNameExtension === "png" || $fileNameExtension === "jpg"){
+        $uri = "/resources/upload/store/{$storeItem->getStoreId()}/presentation/presentation.{$fileNameExtension}";
+    }
+    
+    array_push($prefile, [
+        "name"  => $storeItem->getSaleContentPresentation(),
+        "URI"   => $uri
+    ]);
+}
+
+$prefileJSON = json_encode($prefile);
+
+?>
+<!-- START CONTENT -->
+<section id="content">
+    <!--breadcrumbs start-->
+    <div id="breadcrumbs-wrapper">
+        <!-- Search for small screen -->
+        <div class="header-search-wrapper grey hide-on-large-only">
+            <i class="mdi-action-search active"></i>
+            <input type="text" name="Search" class="header-search-input z-depth-2" placeholder="Explorar en la plataforma">
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m12 l12">
+                    <h5 class="breadcrumbs-title">Producto en almacén</h5>
+                    <ol class="breadcrumbs">
+                        <li><a href="/project/<?= $project->getProjectId() ?>/product-structure/<?= $storeItem->getStoreId() ?>">Estructura y planificación</a></li>
+                        <li class="active">Ventas</li>
+                        <li><a href="/store/<?= $storeItem->getStoreId() ?>/enrollment">Matrículas</a></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--breadcrumbs end-->
+    <!--start container-->
+    <div class="container">
+        <div class="section">
+            
+            <div class="card-panel">
+                <div class="row">
+                    <form class="col s12" 
+                          method="post"
+                          action="<?= $storeItem->getStoreId() ?>"
+                          name="sale-form">
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <select name="type-coin">
+                                    <?php
+                                    if($storeItem->getTypeCoin()){
+                                        ?>
+                                        <option value="<?= Store::TYPE_COIN_PEN ?>"><?= Store::TYPE_COIN_PEN ?></option>
+                                        <?php
+                                    }
+                                    
+                                    $typesCoin = [Store::TYPE_COIN_PEN, Store::TYPE_COIN_USD];
+                                    
+                                    _::each($typesCoin, function($typeCoin){
+                                        ?>
+                                        <option value="<?= $typeCoin ?>"><?= $typeCoin ?></option>
+                                        <?php
+                                    });
+                                    ?>
+                                </select>
+                                <label>Tipo de Moneda</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input type="text" name="minimun-price" value="<?= $storeItem->getMinimunPrice() ?>">
+                                <label>Precio mínimo</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <input type="text" name="price" value="<?= $storeItem->getPrice() ?>">
+                                <label>Precio</label>
+                            </div>
+                            <div class="input-field col s3">
+                                <input type="text" name="stock" value="<?= $storeItem->getStock() ?>">
+                                <label>Cantidad de vacantes</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <textarea id="description" class="materialize-textarea" name="description"><?= $storeItem->getSaleInformation() ?></textarea>
+                                <label for="description">Descripción</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <br>
+                                <div id="multimedia-file"></div>
+                                <label class="active">Documento de presentación</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <button class="btn cyan waves-effect waves-light right" type="submit"> Guardar Cambios
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <h4 class="header2">Descuentos</h4>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <button class="btn cyan waves-effect waves-light" type="button" id="button-discount" disabled>Eliminar</button>
+                                        <a class="btn cyan waves-effect waves-light" href="<?= $storeItem->getStoreId() ?>/create-discount">Registrar Descuento</a>
+                                    </div>
+                                </div>
+                                <table id="discount-table" class="responsive-table display" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Item</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Descripción</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th>Item</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Descripción</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    <?php
+                                    if($discounts){
+                                        $discountCounter = 1;
+                                        
+                                        _::each($discounts, function(Discount $discount) use (&$discountCounter){
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="browser-default" value="<?= $discount->getDiscountId() ?>">
+                                                </td>
+                                                <td><?= $discountCounter++ ?></td>
+                                                <td><?= $discount->getType() ?></td>
+                                                <td><?= $discount->getValue() ?></td>
+                                                <td><?= substr_with_dots($discount->getDescription(), 60) ?></td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    }else{
+                                        ?>
+                                        <tr>
+                                            <td colspan="5">No hay descuentos configurados</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <h4 class="header2">Interés</h4>
+                                <div class="row">
+                                    <div class="col s12">
+                                        <button class="btn cyan waves-effect waves-light" type="button" id="button-interest" disabled>Eliminar</button>
+                                        <a class="btn cyan waves-effect waves-light" href="<?= $storeItem->getStoreId() ?>/create-interest">Registrar Interés</a>
+                                    </div>
+                                </div>
+                                <table id="interest-table" class="responsive-table display" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>Item</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Descripción</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th></th>
+                                            <th>Item</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Descripción</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    <?php
+                                    if($interests){
+                                        $interestCounter = 1;
+                                        
+                                        _::each($interests, function(Interest $interest) use (&$interestCounter){
+                                            ?>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" class="browser-default" value="<?= $interest->getInterestId() ?>">
+                                                </td>
+                                                <td><?= $interestCounter++ ?></td>
+                                                <td><?= $interest->getType() ?></td>
+                                                <td><?= $interest->getValue() ?></td>
+                                                <td><?= substr_with_dots($interest->getDescription(), 60) ?></td>
+                                            </tr>
+                                            <?php
+                                        });
+                                    }else{
+                                        ?>
+                                        <tr>
+                                            <td colspan="5">No hay intereses configurados</td>
+                                        </tr>
+                                        <?php
+                                    }
+                                    ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    /*
+                     * Upload
+                     */
+                    var upload = new Upload({
+                        id      : '#multimedia-file',
+                        name    : 'multimedia-file',
+                        token   : '<?= $uploadToken ?>',
+                        preFiles: <?= $prefileJSON ?>
+                    });
+                    
+                    upload.open();
+                    
+                    /*
+                     * For discounts
+                     */
+                    var $discountButton = $("#button-discount");
+                    
+                    $("#discount-table input[type=checkbox]").click(function(e){
+                        var selectedDiscountIds = [];
+                        
+                        $("#discount-table input[type=checkbox]:checked").each(function(){
+                            selectedDiscountIds.push($(this).val());
+                        });
+                        
+                        if(selectedDiscountIds.length){
+                            $discountButton.attr("disabled", false);
+                        }else{
+                            $discountButton.attr("disabled", true);
+                        }
+                    });
+                    
+                    $discountButton.click(function(e){
+                        var selectedDiscountIds = [];
+                        
+                        $("#discount-table input[type=checkbox]:checked").each(function(){
+                            selectedDiscountIds.push($(this).val());
+                        });
+                        
+                        if(!selectedDiscountIds.length){
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url     : "<?= $storeItem->getStoreId() ?>/delete-discounts",
+                            method  : "POST",
+                            data    : { 
+                                discountIds : selectedDiscountIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                    
+                    /*
+                     * For interests
+                     */
+                    var $interestButton = $("#button-interest");
+                    
+                    $("#interest-table input[type=checkbox]").click(function(e){
+                        var selectedInterestIds = [];
+                        
+                        $("#interest-table input[type=checkbox]:checked").each(function(){
+                            selectedInterestIds.push($(this).val());
+                        });
+                        
+                        if(selectedInterestIds.length){
+                            $interestButton.attr("disabled", false);
+                        }else{
+                            $interestButton.attr("disabled", true);
+                        }
+                    });
+                    
+                    $interestButton.click(function(e){
+                        var selectedInterestIds = [];
+                        
+                        $("#interest-table input[type=checkbox]:checked").each(function(){
+                            selectedInterestIds.push($(this).val());
+                        });
+                        
+                        if(!selectedInterestIds.length){
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url     : "<?= $storeItem->getStoreId() ?>/delete-interests",
+                            method  : "POST",
+                            data    : { 
+                                interestIds : selectedInterestIds
+                            },
+                            dataType: "json"
+                        })
+                        .done(function(response){
+                            console.log(response);
+                            if (response.success){
+                                window.location.reload();
+                            } else {
+                                window.Materialize.toast(response.message, 3000);
+                            }
+                        })
+                        .fail(function(response){
+                            console.log(response.responseText);
+                        });
+                    });
+                });
+            </script>
+            
+        </div>
+    </div>
+    <!--end container-->
+</section>
+<!-- END CONTENT -->
